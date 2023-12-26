@@ -41,19 +41,26 @@ def verify_lab_accessible(url):
 
     soup = BeautifulSoup(resp.text, "html.parser")
     title = soup.title.text
-    print_info(title)
 
-    # Map lab title to path by visiting 'https://portswigger.net/web-security/all-labs'
+    print_info(f"Using lab title ({title}) to determine module path...")
     resp = requests.get("https://portswigger.net/web-security/all-labs")
     soup = BeautifulSoup(resp.text, "html.parser")
 
     matchfunc = lambda tag: tag.text == title
     res = soup.find(matchfunc)
     path = res.attrs["href"]
-    # module = path[1:].replace('/', '.')
-    # importlib.import_module('.cross_site_scripting', 'web_security')
-    print_success(path)
-    exit()
+    path = path.split("/")[1:]
+    print_info(
+        f'Attempting to import function "solve_lab" from module "{".".join(path)}"...'
+    )
+
+    package = path[0]
+    module = ".".join(path[1:])
+    module = importlib.import_module(f".{module}", package)
+
+    solve_lab = getattr(module, "solve_lab")
+    print_success("Success. Now attempting to solve lab...\n")
+    solve_lab(url, None)
 
     # TODO: import_module + getattr
 
@@ -68,10 +75,6 @@ def verify_lab_solved(url):
         print_fail("Lab unsolved. Ensure...")
 
 
-def solve_lab(url, proxies):
-    pass
-
-
 def main():
     args = get_args()
     root_url = urljoin(args.url, "/")
@@ -83,7 +86,7 @@ def main():
         proxies = {"http": "http://localhost:8080", "https": "http://localhost:8080"}
         print_info('Using "http://127.0.0.1:8080" as a proxy')
 
-    solve_lab(root_url, proxies)
+    # solve_lab(root_url, proxies)
     verify_lab_solved(root_url)
 
 

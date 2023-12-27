@@ -49,7 +49,9 @@ def solve_lab(url, proxies):
             welcome_back = soup.find(string="Welcome back!")
 
             if welcome_back is None:
-                print_info_secondary(f"{i+1}, '{c}' => False | Progress: {password}...", end="")
+                print_info_secondary(
+                    f"{i+1}, '{c}' => False | Progress: {password}...", end=""
+                )
             else:
                 print_success(
                     f"{i+1}, '{c}' => True  | Progress: {password}...", end=""
@@ -88,4 +90,3 @@ def solve_lab(url, proxies):
         data=data,
     )
     print_success("SQL injection attack performed.\n")
-

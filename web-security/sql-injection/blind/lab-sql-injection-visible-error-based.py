@@ -5,6 +5,7 @@ from urllib.parse import urljoin
 import requests
 import re
 
+
 def solve_lab(url, proxies):
     print_info(f'Extracting passwords by visiting "{url}" with the following cookies:')
     print(

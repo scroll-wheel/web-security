@@ -1,10 +1,4 @@
-from .utils import (
-    print_success,
-    print_fail,
-    print_warning,
-    print_info,
-    print_info_secondary,
-)
+from .utils import *
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 

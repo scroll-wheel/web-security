@@ -12,4 +12,3 @@ def solve_lab(url, proxies):
 
     requests.get(url, params=params, proxies=proxies, verify=False)
     print_success("Reflected XSS attack performed.\n")
-

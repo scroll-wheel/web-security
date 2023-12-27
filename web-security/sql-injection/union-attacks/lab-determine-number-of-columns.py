@@ -35,4 +35,3 @@ def solve_lab(url, proxies):
 
     requests.get(url, params=params, proxies=proxies, verify=False)
     print_success("SQL injection UNION attack performed.\n")
-

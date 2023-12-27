@@ -96,4 +96,3 @@ def solve_lab(url, proxies):
         data=data,
     )
     print_success("SQL injection attack performed.\n")
-

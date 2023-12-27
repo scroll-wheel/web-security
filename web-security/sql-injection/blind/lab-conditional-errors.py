@@ -45,7 +45,9 @@ def solve_lab(url, proxies):
             resp = requests.get(url, proxies=proxies, verify=False, cookies=cookies)
 
             if resp.status_code == 200:
-                print_info_secondary(f"{i+1}, '{c}' => 200 | Progress: {password}...", end="")
+                print_info_secondary(
+                    f"{i+1}, '{c}' => 200 | Progress: {password}...", end=""
+                )
             else:
                 print_success(
                     f"{i+1}, '{c}' => {resp.status_code} | Progress: {password}...",

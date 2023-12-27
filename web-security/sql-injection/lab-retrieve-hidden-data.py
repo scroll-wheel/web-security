@@ -1,4 +1,4 @@
-from ..main import print_info, print_success
+from ..utils import *
 from urllib.parse import urlencode, urljoin
 
 import requests

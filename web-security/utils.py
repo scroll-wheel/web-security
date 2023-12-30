@@ -17,3 +17,7 @@ def print_info_secondary(string, end="\n"):
 def print_fail(string):
     print(f"\r\033[1;91m[-]\033[00m {string}")
     exit(1)
+
+
+def print_input(string):
+    return input(f"\r\033[1;93m[i]\033[00m {string}")

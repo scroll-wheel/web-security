@@ -2,7 +2,6 @@ from ...utils import *
 from ...exploit_server import ExploitServer
 
 from urllib.parse import urljoin
-from html import unescape
 from lxml import etree
 
 import requests
@@ -30,7 +29,7 @@ def solve_lab(url, proxies):
     data = etree.tostring(
         stock_check, encoding="UTF-8", xml_declaration=True, doctype=doctype
     )
-    data = unescape(data.decode())
+    data = data.decode()
 
     print_info(
         f'Injecting an XML external entity with the following POST request data to "{url}":\n'

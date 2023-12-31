@@ -1,6 +1,5 @@
 from ..utils import *
 from urllib.parse import urljoin
-from html import unescape
 from lxml import etree
 
 import requests

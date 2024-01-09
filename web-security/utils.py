@@ -28,11 +28,10 @@ def print_input(string):
     return input(f"\r\033[1;93m[i]\033[00m {string}")
 
 
-def get_csrf_token(url, proxies):
+def get_csrf_token(session, url):
     print_info(f'Grabbing CSRF value from "{url}"...')
 
-    s = requests.Session()
-    resp = s.get(url, proxies=proxies, verify=False)
+    resp = session.get(url)
     soup = BeautifulSoup(resp.text, "html.parser")
     csrf = soup.select_one('input[name="csrf"]').get("value")
 
@@ -41,4 +40,4 @@ def get_csrf_token(url, proxies):
     else:
         print_success(f"CSRF value: {csrf}\n")
 
-    return s, csrf
+    return csrf

@@ -7,8 +7,6 @@ import argparse
 import requests
 import urllib3
 
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -70,12 +68,19 @@ def main():
     path = verify_lab_url(root_url)
     solve_lab = get_solve_lab_func(path)
 
+    session = requests.Session()
+
     proxies = None
     if args.use_proxy:
-        proxies = {"http": "http://localhost:8080", "https": "http://localhost:8080"}
+        session.proxies = {
+            "http": "http://localhost:8080",
+            "https": "http://localhost:8080",
+        }
+        session.verify = False
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         print_info('Using "http://127.0.0.1:8080" as a proxy')
 
-    solve_lab(root_url, proxies)
+    solve_lab(session, root_url)
     verify_lab_solved(root_url)
 
 

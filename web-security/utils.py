@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+from urllib.parse import urljoin
 
 import requests
 
@@ -41,3 +42,15 @@ def get_csrf_token(session, url):
         print_success(f"CSRF value: {csrf}\n")
 
     return csrf
+
+
+def submit_solution(session, url, answer):
+    print_info(f'Submitting "{answer}" as solution...')
+    url = urljoin(url, "/submitSolution")
+    data = {"answer": answer}
+    resp = session.post(url, data=data)
+
+    if resp.json()["correct"]:
+        print_success("Correct answer!\n")
+    else:
+        print_fail("Incorrect answer.")

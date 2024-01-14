@@ -79,7 +79,7 @@ def main():
             session.verify = False
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
             print_info('Using "http://127.0.0.1:8080" as a proxy')
-        solve_lab(session, root_url)
+        solve_lab(session)
 
     verify_lab_solved(root_url)
 

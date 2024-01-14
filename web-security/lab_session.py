@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from requests import Session
 
+from .exploit_server import ExploitServer
 from .utils import *
 
 class LabSession(Session):
@@ -31,14 +32,18 @@ class LabSession(Session):
             print_success(f"CSRF value: {csrf}\n")
         return csrf
 
-    def login(self, username, password):
-        csrf = self.get_csrf_token("/login")
-        data = {"csrf": csrf, "username": username, "password": password}
-        print_info(f'Logging in with the credentials "{username}:{password}"')
-        resp = self.post_path("/login", data=data)
+    def login(self, username, password, with_csrf=True):
+        if not with_csrf:
+            data = {"username": username, "password": password}
+        else:
+            csrf = self.get_csrf_token("/login")
+            data = {"csrf": csrf, "username": username, "password": password}
 
+        print_info(f'Logging in with username "{username}" and password "{password}"...')
+        resp = self.post_path("/login", data=data)
         soup = BeautifulSoup(resp.text, "html.parser")
         invalid_creds = soup.find(text="Invalid username or password.")
+
         if invalid_creds:
             print_fail("Invalid credentials.")
         else:
@@ -54,3 +59,8 @@ class LabSession(Session):
             print_success("Correct answer!\n")
         else:
             print_fail("Incorrect answer.")        
+
+    def exploit_server(self):
+        if not hasattr(self, 'ExploitServer'):
+            self.ExploitServer = ExploitServer(self)
+        return self.ExploitServer

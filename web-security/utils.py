@@ -29,15 +29,20 @@ def print_input(string):
 
 
 def auth_lab_usernames():
-    resp = requests.get('https://portswigger.net/web-security/authentication/auth-lab-usernames')
+    resp = requests.get(
+        "https://portswigger.net/web-security/authentication/auth-lab-usernames"
+    )
     soup = BeautifulSoup(resp.text, "html.parser")
     query = soup.select_one("code")
     result = query.text.split("\n")
     print_info("Loaded Authentication lab usernames into memory")
     return result
 
+
 def auth_lab_passwords():
-    resp = requests.get('https://portswigger.net/web-security/authentication/auth-lab-passwords')
+    resp = requests.get(
+        "https://portswigger.net/web-security/authentication/auth-lab-passwords"
+    )
     soup = BeautifulSoup(resp.text, "html.parser")
     query = soup.select_one("code")
     result = query.text.split("\n")

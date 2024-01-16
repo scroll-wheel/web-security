@@ -67,3 +67,4 @@ class LabSession(Session):
         if not hasattr(self, "ExploitServer"):
             self.ExploitServer = ExploitServer(self)
         return self.ExploitServer
+

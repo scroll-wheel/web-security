@@ -1,5 +1,4 @@
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin
 
 import requests
 
@@ -29,28 +28,18 @@ def print_input(string):
     return input(f"\r\033[1;93m[i]\033[00m {string}")
 
 
-def get_csrf_token(session, url):
-    print_info(f'Grabbing CSRF value from "{url}"...')
-
-    resp = session.get(url)
+def auth_lab_usernames():
+    resp = requests.get('https://portswigger.net/web-security/authentication/auth-lab-usernames')
     soup = BeautifulSoup(resp.text, "html.parser")
-    csrf = soup.select_one('input[name="csrf"]').get("value")
+    query = soup.select_one("code")
+    result = query.text.split("\n")
+    print_info("Loaded Authentication lab usernames into memory")
+    return result
 
-    if csrf is None:
-        print_fail("Unable to grab CSRF value.")
-    else:
-        print_success(f"CSRF value: {csrf}\n")
-
-    return csrf
-
-
-def submit_solution(session, url, answer):
-    print_info(f'Submitting "{answer}" as solution...')
-    url = urljoin(url, "/submitSolution")
-    data = {"answer": answer}
-    resp = session.post(url, data=data)
-
-    if resp.json()["correct"]:
-        print_success("Correct answer!\n")
-    else:
-        print_fail("Incorrect answer.")
+def auth_lab_passwords():
+    resp = requests.get('https://portswigger.net/web-security/authentication/auth-lab-passwords')
+    soup = BeautifulSoup(resp.text, "html.parser")
+    query = soup.select_one("code")
+    result = query.text.split("\n")
+    print_info("Loaded Authentication lab passwords into memory")
+    return result

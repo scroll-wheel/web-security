@@ -1,8 +1,8 @@
-from .utils import *
+from web_security_academy.core.utils import *
+from web_security_academy.core.lab_session import LabSession
+
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
-
-from .lab_session import LabSession
 
 import importlib
 import argparse
@@ -41,12 +41,9 @@ def verify_lab_url(url):
 
 
 def get_solve_lab_func(path):
-    path = path.split("/")[1:]
-    print_info_secondary(f'Module path: {".".join(path)}')
-
-    package = path[0]
-    module = ".".join(path[1:])
-    module = importlib.import_module(f".{module}", package)
+    module_path = path.replace("/", ".")
+    print_info_secondary(f'Module path: {module_path}')
+    module = importlib.import_module(f"web_security_academy{module_path}")
 
     module_solve_lab = getattr(module, "solve_lab")
     print_success('Successfully imported "solve_lab" function from module.\n')

@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
-from importlib import import_module
+from web_security_academy.main import main
 
 if __name__ == "__main__":
-    module = import_module("web-security.main")
-    main = getattr(module, "main")
     main()

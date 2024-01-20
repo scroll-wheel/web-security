@@ -1,4 +1,4 @@
-from ...utils import (
+from web_security_academy.core.utils import (
     auth_lab_usernames,
     auth_lab_passwords,
     print_info,

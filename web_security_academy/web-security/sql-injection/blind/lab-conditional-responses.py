@@ -1,4 +1,4 @@
-from ...utils import *
+from web_security_academy.core.utils import *
 from bs4 import BeautifulSoup
 import string
 

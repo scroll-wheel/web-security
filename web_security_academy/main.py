@@ -42,7 +42,7 @@ def verify_lab_url(url):
 
 def get_solve_lab_func(path):
     module_path = path.replace("/", ".")
-    print_info_secondary(f'Module path: {module_path}')
+    print_info_secondary(f"Module path: {module_path}")
     module = importlib.import_module(f"web_security_academy{module_path}")
 
     module_solve_lab = getattr(module, "solve_lab")

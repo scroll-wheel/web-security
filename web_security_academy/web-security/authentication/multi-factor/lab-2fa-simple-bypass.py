@@ -1,4 +1,9 @@
-from web_security_academy.core.utils import print_info, print_info_secondary, print_success, print_fail
+from web_security_academy.core.utils import (
+    print_info,
+    print_info_secondary,
+    print_success,
+    print_fail,
+)
 
 
 def solve_lab(session):

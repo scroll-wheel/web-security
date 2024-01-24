@@ -19,17 +19,18 @@ class LabSession(Session):
         url = urljoin(self.url, path)
         return Session.post(self, url, **kwargs)
 
-    def get_csrf_token(self, path):
+    def get_csrf_token(self, path, n=1):
         url = urljoin(self.url, path)
         print_info(f'Grabbing CSRF value from "{url}"...')
 
         resp = Session.get(self, url)
         soup = BeautifulSoup(resp.text, "html.parser")
-        csrf = soup.select_one('input[name="csrf"]').get("value")
+        query = soup.select('input[name="csrf"]')
 
-        if csrf is None:
+        if len(query) < n:
             print_fail("Unable to grab CSRF value.")
         else:
+            csrf = query[n - 1].get("value")
             print_success(f"CSRF value: {csrf}\n")
         return csrf
 

@@ -52,6 +52,8 @@ class LabSession(Session):
         else:
             print_success("Successfully logged in.\n")
 
+        return resp
+
     def submit_solution(self, answer):
         print_info(f'Submitting "{answer}" as solution...')
         url = urljoin(self.url, "/submitSolution")

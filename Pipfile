@@ -8,6 +8,7 @@ bs4 = "*"
 httpcore = {extras = ["asyncio"], version = "*"}
 httpx = {extras = ["http2"], version = "*"}
 lxml = "*"
+pyjwt = {extras = ["crypto"], version = "*"}
 requests = "*"
 
 [dev-packages]

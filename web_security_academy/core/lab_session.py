@@ -83,7 +83,6 @@ class LabSession(Session):
         return self.ExploitServer
 
     # TODO: Make this work through a proxy
-    # TODO: Return some data
     def single_packet_send(self, *prepared_requests):
         # Set up SSL socket wrapper
         ctx = ssl.create_default_context(cafile=certifi.where())
@@ -127,4 +126,29 @@ class LabSession(Session):
             else:
                 conn.end_stream()
         sock.sendall(conn.data_to_send())
+
+        responses = [
+            {"headers": None, "data": b""} for _ in range(len(prepared_requests) + 1)
+        ]
+
+        ended_streams = 0
+        while ended_streams < len(prepared_requests) + 1:
+            data = sock.recv(65536 * 1024)
+            if not data:
+                break
+
+            events = conn.receive_data(data)
+            for event in events:
+                if isinstance(event, h2.events.ResponseReceived):
+                    headers = [(k.decode(), v.decode()) for k, v in event.headers]
+                    responses[event.stream_id // 2]["headers"] = dict(headers)
+                if isinstance(event, h2.events.DataReceived):
+                    conn.acknowledge_received_data(
+                        event.flow_controlled_length, event.stream_id
+                    )
+                    responses[event.stream_id // 2]["data"] += event.data
+                if isinstance(event, h2.events.StreamEnded):
+                    ended_streams += 1
+
         sock.close()
+        return responses[:-1]

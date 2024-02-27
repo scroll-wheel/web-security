@@ -1,9 +1,15 @@
 from web_security_academy.core.logger import logger
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 from requests import Session
 
 from .exploit_server import ExploitServer
+
+import certifi
+import ssl
+import socket
+import h2
+from time import sleep
 
 
 class LabSession(Session):
@@ -75,3 +81,83 @@ class LabSession(Session):
         if not hasattr(self, "ExploitServer"):
             self.ExploitServer = ExploitServer(self)
         return self.ExploitServer
+
+    # TODO: Make this work through a proxy
+    def single_packet_send(self, *prepared_requests):
+        # Set up SSL socket wrapper
+        ctx = ssl.create_default_context(cafile=certifi.where())
+        ctx.set_alpn_protocols(["h2"])
+
+        # Set up socket
+        hostname = urlparse(self.url).hostname
+        sock = socket.create_connection((hostname, 443))
+        sock = ctx.wrap_socket(sock, server_hostname=hostname)
+        sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 0)
+
+        # Set up H2 connection
+        conn = h2.connection.H2Connection()
+        conn.initiate_connection()
+        sock.sendall(conn.data_to_send())
+
+        # Only accept HTTP responses with no encoding
+        for req in prepared_requests:
+            req.headers["Accept-Encoding"] = "identity"
+
+        # Send partial requests
+        stream_ids = []
+        base_headers = [(":authority", hostname), (":scheme", "https")]
+        for i, r in enumerate(prepared_requests):
+            path = urlparse(r.url).path + "?" + urlparse(r.url).query
+            headers = base_headers + [(":method", r.method), (":path", path)]
+            headers += list(r.headers.items())
+
+            stream_ids.append(conn.get_next_available_stream_id())
+            conn.send_headers(stream_ids[i], headers)
+            if (r.body is not None) and (len(r.body) > 1):
+                conn.send_data(stream_ids[i], r.body[:-1].encode())
+            sock.sendall(conn.data_to_send())
+
+        # Wait and warm up connection
+        sleep(0.1)
+        headers = base_headers + [(":method", "GET"), (":path", "/")]
+        conn.send_headers(conn.get_next_available_stream_id(), headers, end_stream=True)
+        sock.sendall(conn.data_to_send())
+
+        # Send single packet finishing all reqeusts
+        for i, r in enumerate(prepared_requests):
+            if (r.body is not None) and (len(r.body) > 1):
+                conn.send_data(stream_ids[i], r.body[-1].encode(), end_stream=True)
+            else:
+                conn.end_stream(stream_ids[i])
+        sock.sendall(conn.data_to_send())
+
+        responses = [
+            {"headers": None, "data": b""} for _ in range(len(prepared_requests) + 1)
+        ]
+
+        ended_streams = 0
+        while ended_streams < len(prepared_requests) + 1:
+            data = sock.recv(65536 * 1024)
+            if not data:
+                break
+
+            events = conn.receive_data(data)
+            for event in events:
+                if isinstance(event, h2.events.ResponseReceived):
+                    headers = [(k.decode(), v.decode()) for k, v in event.headers]
+                    responses[event.stream_id // 2]["headers"] = dict(headers)
+                if isinstance(event, h2.events.DataReceived):
+                    conn.acknowledge_received_data(
+                        event.flow_controlled_length, event.stream_id
+                    )
+                    responses[event.stream_id // 2]["data"] += event.data
+                if isinstance(event, h2.events.StreamEnded):
+                    decoded = responses[event.stream_id // 2]["data"].decode()
+                    responses[event.stream_id // 2]["data"] = decoded
+                    ended_streams += 1
+
+        conn.close_connection()
+        sock.sendall(conn.data_to_send())
+
+        sock.close()
+        return responses[:-1]

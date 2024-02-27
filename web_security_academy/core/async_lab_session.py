@@ -16,7 +16,7 @@ class AsyncLabSession(AsyncClient):
             proxies = LabSession.proxies["http"]
             verify = False
 
-        AsyncClient.__init__(self, proxies=proxies, verify=verify)
+        AsyncClient.__init__(self, http2=True, proxies=proxies, verify=verify)
         self.url = LabSession.url
 
     async def get_path(self, path, **kwargs):

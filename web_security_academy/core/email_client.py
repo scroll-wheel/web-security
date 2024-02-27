@@ -1,6 +1,7 @@
-from bs4 import BeautifulSoup
-from .utils import *
+from web_security_academy.core.logger import logger
+
 from urllib.parse import urljoin
+from bs4 import BeautifulSoup
 import re
 
 
@@ -8,17 +9,18 @@ class EmailClient:
     def __init__(self, session):
         self.session = session
 
-        print_info("Determining email client URL...")
+        logger.debug("Determining email client URL...")
 
         resp = session.get_path("/")
         soup = BeautifulSoup(resp.text, "html.parser")
         exploit_link = soup.select_one("#exploit-link")
 
         if exploit_link is None:
-            print_fail("Unable to find email client URL.")
+            logger.failure("Unable to find email client URL.")
+            exit(1)
         else:
             self.url = exploit_link.get("href")
-            print_success(f"Email client URL: {self.url}\n")
+            logger.info(f"Email client URL: {self.url}")
 
         self.update_emails()
 
@@ -40,6 +42,6 @@ class EmailClient:
                 "To": data[1].text,
                 "From": data[2].text,
                 "Subject": data[3].text,
-                "Body": data[4].text,
+                "Body": data[4],
             }
             self.emails.append(email)

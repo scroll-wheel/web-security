@@ -5,9 +5,13 @@ name = "pypi"
 
 [packages]
 bs4 = "*"
-httpx = "*"
+gmpy2 = "*"
+httpcore = {extras = ["asyncio"], version = "*"}
+httpx = {extras = ["http2"], version = "*"}
 lxml = "*"
+pycryptodomex = "*"
 pyjwt = {extras = ["crypto"], version = "*"}
+python-jose = "*"
 requests = "*"
 
 [dev-packages]

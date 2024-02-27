@@ -99,11 +99,15 @@ class LabSession(Session):
         conn.initiate_connection()
         sock.sendall(conn.data_to_send())
 
+        # Only accept HTTP responses with no encoding
+        for req in prepared_requests:
+            req.headers["Accept-Encoding"] = "identity"
+
         # Send partial requests
         stream_ids = []
         base_headers = [(":authority", hostname), (":scheme", "https")]
         for i, r in enumerate(prepared_requests):
-            path = urlparse(r.url).path
+            path = urlparse(r.url).path + "?" + urlparse(r.url).query
             headers = base_headers + [(":method", r.method), (":path", path)]
             headers += list(r.headers.items())
 
@@ -124,7 +128,7 @@ class LabSession(Session):
             if (r.body is not None) and (len(r.body) > 1):
                 conn.send_data(stream_ids[i], r.body[-1].encode(), end_stream=True)
             else:
-                conn.end_stream()
+                conn.end_stream(stream_ids[i])
         sock.sendall(conn.data_to_send())
 
         responses = [
@@ -148,7 +152,12 @@ class LabSession(Session):
                     )
                     responses[event.stream_id // 2]["data"] += event.data
                 if isinstance(event, h2.events.StreamEnded):
+                    decoded = responses[event.stream_id // 2]["data"].decode()
+                    responses[event.stream_id // 2]["data"] = decoded
                     ended_streams += 1
+
+        conn.close_connection()
+        sock.sendall(conn.data_to_send())
 
         sock.close()
         return responses[:-1]

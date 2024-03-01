@@ -37,7 +37,7 @@ def currency_to_number(currency):
 
 def get_product_info(session, productId):
     resp = session.get_path("/product", params={"productId": productId})
-    soup = BeautifulSoup(resp.text, "html.parser")
+    soup = BeautifulSoup(resp.text, "lxml")
     name = soup.select_one(".product h3").text
     price = soup.select_one(".product #price").text
     return name, currency_to_number(price)

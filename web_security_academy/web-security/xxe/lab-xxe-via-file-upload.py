@@ -56,7 +56,7 @@ def solve_lab(session):
     print_info(f'Extracting avatar image URL from "{path}?{urlencode(params)}"')
 
     resp = session.get_path(path, params=params)
-    soup = BeautifulSoup(resp.text, "html.parser")
+    soup = BeautifulSoup(resp.text, "lxml")
     avatar_img = soup.select(".avatar")
     if len(avatar_img) == 0:
         print_fail("Unable to extract avatar image URL.")

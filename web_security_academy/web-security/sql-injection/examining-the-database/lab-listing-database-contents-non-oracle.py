@@ -51,7 +51,7 @@ def solve_lab(session):
     print(params)
 
     resp = session.get_path(path, params=params)
-    soup = BeautifulSoup(resp.text, "html.parser")
+    soup = BeautifulSoup(resp.text, "lxml")
     query = soup.find(lambda tag: tag.name == "th" and tag.text.startswith("users"))
 
     if query is None:
@@ -73,7 +73,7 @@ def solve_lab(session):
     print(params)
 
     resp = session.get_path(path, params=params)
-    soup = BeautifulSoup(resp.text, "html.parser")
+    soup = BeautifulSoup(resp.text, "lxml")
     q1 = soup.find(lambda tag: tag.name == "th" and tag.text.startswith("username"))
     q2 = soup.find(lambda tag: tag.name == "th" and tag.text.startswith("password"))
 
@@ -99,7 +99,7 @@ def solve_lab(session):
     print(params)
 
     resp = session.get_path(path, params=params)
-    soup = BeautifulSoup(resp.text, "html.parser")
+    soup = BeautifulSoup(resp.text, "lxml")
     query = soup.find(lambda tag: tag.name == "th")
 
     if query is None:

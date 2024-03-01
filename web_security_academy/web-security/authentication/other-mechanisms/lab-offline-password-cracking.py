@@ -48,7 +48,7 @@ def solve_lab(session):
     print_info(f'Reversing MD5 hash "{carlos_hash}" on "{md5_center}"...')
     resp = session.get(md5_center, params={"md5": carlos_hash})
 
-    soup = BeautifulSoup(resp.text, "html.parser")
+    soup = BeautifulSoup(resp.text, "lxml")
     query = soup.select_one("#string")
     if query is None or query.get("value") is None:
         print_fail("Unable to reverse MD5 hash.")

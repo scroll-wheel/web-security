@@ -5,7 +5,7 @@ import re
 
 def get_product_info(session, productId):
     resp = session.get_path("/product", params={"productId": productId})
-    soup = BeautifulSoup(resp.text, "html.parser")
+    soup = BeautifulSoup(resp.text, "lxml")
     name = soup.select_one(".product h3").text
     price = soup.select_one(".product #price").text
     return name, price
@@ -13,7 +13,7 @@ def get_product_info(session, productId):
 
 def solve_lab(session):
     resp = session.login("wiener", "peter")
-    soup = BeautifulSoup(resp.text, "html.parser")
+    soup = BeautifulSoup(resp.text, "lxml")
     regex = re.compile(f"Store credit: (.*)")
     credit = soup.find(text=regex)
     credit = re.match(regex, credit).group(1)

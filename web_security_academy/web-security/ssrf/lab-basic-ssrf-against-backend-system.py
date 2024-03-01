@@ -25,7 +25,7 @@ def solve_lab(session):
         print_fail("Unable to find an admin interface on port 8080.")
 
     print_info("Using latest response to find URL to delete the user carlos...")
-    soup = BeautifulSoup(resp.text, "html.parser")
+    soup = BeautifulSoup(resp.text, "lxml")
     tag = soup.find(lambda tag: tag.has_attr("href") and "carlos" in tag.get("href"))
 
     if tag is None:

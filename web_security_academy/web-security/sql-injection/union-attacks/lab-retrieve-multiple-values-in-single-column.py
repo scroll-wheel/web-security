@@ -52,7 +52,7 @@ def solve_lab(session):
     print(params)
 
     resp = session.get_path(path, params=params)
-    soup = BeautifulSoup(resp.text, "html.parser")
+    soup = BeautifulSoup(resp.text, "lxml")
     query = soup.find_all(lambda tag: tag.name == "th")
 
     if len(query) == 0:

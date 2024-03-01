@@ -6,7 +6,7 @@ import re
 def solve_lab(session):
     print_info("Extracting string value provided by lab...")
     resp = session.get_path("/")
-    soup = BeautifulSoup(resp.text, "html.parser")
+    soup = BeautifulSoup(resp.text, "lxml")
     hint = soup.select_one("#hint").text
 
     value = re.match(r"Make the database retrieve the string: '([^']+)'", hint).group(1)

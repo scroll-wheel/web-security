@@ -12,7 +12,7 @@ class EmailClient:
         logger.debug("Determining email client URL...")
 
         resp = session.get_path("/")
-        soup = BeautifulSoup(resp.text, "html.parser")
+        soup = BeautifulSoup(resp.text, "lxml")
         exploit_link = soup.select_one("#exploit-link")
 
         if exploit_link is None:
@@ -26,7 +26,7 @@ class EmailClient:
 
     def update_emails(self):
         resp = self.session.get(self.url)
-        soup = BeautifulSoup(resp.text, "html.parser")
+        soup = BeautifulSoup(resp.text, "lxml")
         h4 = soup.select_one("h4")
         self.address = re.match("Your email address is (.*)", h4.text).group(1)
 
@@ -35,7 +35,7 @@ class EmailClient:
 
         self.emails = []
         for row in query:
-            soup = BeautifulSoup(str(row), "html.parser")
+            soup = BeautifulSoup(str(row), "lxml")
             data = soup.select("td")
             email = {
                 "Sent": data[0].text,

@@ -30,7 +30,7 @@ def solve_lab(session, *args):
 
     # Delete user carlos
     print_info("Using the response to find URL to delete the user carlos...")
-    soup = BeautifulSoup(resp.text, "html.parser")
+    soup = BeautifulSoup(resp.text, "lxml")
     tag = soup.find(lambda tag: tag.has_attr("href") and "carlos" in tag.get("href"))
     if tag is None:
         print_fail("Unable to find URL.")

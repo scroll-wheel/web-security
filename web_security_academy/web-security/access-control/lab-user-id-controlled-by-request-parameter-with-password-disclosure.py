@@ -26,7 +26,7 @@ def solve_lab(session, *args):
     if resp.status_code != 200:
         print_fail("Unable to visit URL.")
 
-    soup = BeautifulSoup(resp.text, "html.parser")
+    soup = BeautifulSoup(resp.text, "lxml")
     password = soup.select_one('input[name="password"]').get("value")
 
     if password is None:
@@ -42,7 +42,7 @@ def solve_lab(session, *args):
     )
     resp = session.get_path("/admin")
 
-    soup = BeautifulSoup(resp.text, "html.parser")
+    soup = BeautifulSoup(resp.text, "lxml")
     tag = soup.find(lambda tag: tag.has_attr("href") and "carlos" in tag.get("href"))
 
     if tag is None:

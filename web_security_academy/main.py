@@ -29,7 +29,7 @@ def verify_lab_url(url, args):
         logger.failure("URL is inaccessible. Please reopen the lab and use new URL")
         exit(1)
 
-    soup = BeautifulSoup(resp.text, "html.parser")
+    soup = BeautifulSoup(resp.text, "lxml")
     title = soup.title.text
     logger.info(f"Lab title: {title}")
     if soup.select_one("#notification-labsolved"):
@@ -45,7 +45,7 @@ def verify_lab_url(url, args):
     resp = requests.get("https://portswigger.net/web-security/all-labs")
 
     # Return the path of the lab with matching title
-    soup = BeautifulSoup(resp.text, "html.parser")
+    soup = BeautifulSoup(resp.text, "lxml")
     matchfunc = lambda tag: tag.text.strip() == title
     res = soup.find(matchfunc)
     return res.attrs["href"]
@@ -64,7 +64,7 @@ def get_solve_lab_func(path):
 def verify_lab_solved(url):
     logger.trace("Revisiting URL to verify if attack was successful...")
     resp = requests.get(url)
-    soup = BeautifulSoup(resp.text, "html.parser")
+    soup = BeautifulSoup(resp.text, "lxml")
     if soup.select_one("#notification-labsolved"):
         logger.success("Lab solved.")
     else:

@@ -12,7 +12,7 @@ def solve_lab(url, proxies):
 
     s = requests.session()
     resp = s.get(url, params=params, proxies=proxies, verify=False)
-    soup = BeautifulSoup(resp.text, "html.parser")
+    soup = BeautifulSoup(resp.text, "lxml")
     csrf = soup.select_one('input[name="csrf"]').get("value")
 
     if csrf is None:

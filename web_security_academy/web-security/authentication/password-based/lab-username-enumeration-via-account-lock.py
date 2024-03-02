@@ -26,7 +26,7 @@ def solve_lab(session):
         session.post_path("/login", data=data)
 
         resp = session.post_path("/login", data=data)
-        soup = BeautifulSoup(resp.text, "html.parser")
+        soup = BeautifulSoup(resp.text, "lxml")
         query = soup.select_one("p.is-warning")
 
         if query is None:
@@ -48,7 +48,7 @@ def solve_lab(session):
         data = {"username": user, "password": password}
         resp = session.post_path("/login", data=data, allow_redirects=False)
 
-        soup = BeautifulSoup(resp.text, "html.parser")
+        soup = BeautifulSoup(resp.text, "lxml")
         query = soup.select_one("p.is-warning")
 
         if query is not None:

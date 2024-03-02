@@ -13,7 +13,7 @@ def solve_lab(session, url):
         params = {"postId": i}
         resp = session.get_path("/post", params=params)
 
-        soup = BeautifulSoup(resp.text, "html.parser")
+        soup = BeautifulSoup(resp.text, "lxml")
         elem = soup.select_one("#blog-author a")
         author = elem.text
 
@@ -33,7 +33,7 @@ def solve_lab(session, url):
     if resp.status_code != 200:
         print_fail("Unable to visit URL.")
 
-    soup = BeautifulSoup(resp.text, "html.parser")
+    soup = BeautifulSoup(resp.text, "lxml")
     regex = re.compile(r"Your API Key is: (.*)")
     match = soup.find(text=regex)
 

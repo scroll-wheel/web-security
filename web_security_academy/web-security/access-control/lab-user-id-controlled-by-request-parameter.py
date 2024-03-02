@@ -14,7 +14,7 @@ def solve_lab(session, url):
     print_info(f'Logging in with the credentials "{username}:{password}"')
     resp = session.post_path("/login", data=data)
 
-    soup = BeautifulSoup(resp.text, "html.parser")
+    soup = BeautifulSoup(resp.text, "lxml")
     invalid_creds = soup.find(text="Invalid username or password.")
     if invalid_creds:
         print_fail("Invalid credentials.")
@@ -26,7 +26,7 @@ def solve_lab(session, url):
     print_info(f'Visiting "{url}?{urlencode(params)}"...')
     resp = session.get_path("/my-account", params=params)
 
-    soup = BeautifulSoup(resp.text, "html.parser")
+    soup = BeautifulSoup(resp.text, "lxml")
     regex = re.compile(r"Your API Key is: (.*)")
     match = soup.find(text=regex)
 

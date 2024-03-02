@@ -161,3 +161,19 @@ class LabSession(Session):
 
         sock.close()
         return responses[:-1]
+
+    # Todo: Add proxy functionality
+    def send_raw(self, req):
+        hostname = urlparse(self.url).hostname
+        with socket.create_connection((hostname, 443)) as sock:
+            ctx = ssl.create_default_context(cafile=certifi.where())
+            with ctx.wrap_socket(sock, server_hostname=hostname) as sock:
+                sock.sendall(req)
+
+                resp = b""
+                while True:
+                    data = sock.recv(65536 * 1024)
+                    resp += data
+                    if not data:
+                        break
+                return resp

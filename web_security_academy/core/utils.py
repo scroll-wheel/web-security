@@ -2,6 +2,7 @@ from web_security_academy.core.logger import logger
 from bs4 import BeautifulSoup
 
 import requests
+import jinja2
 
 
 def print_success(string, end="\n"):
@@ -49,3 +50,9 @@ def auth_lab_passwords():
     result = query.text.split("\n")
     logger.info("Loaded Authentication lab passwords into memory")
     return result
+
+
+def generate_csrf_html(req):
+    env = jinja2.Environment(loader=jinja2.FileSystemLoader("templates"))
+    template = env.get_template("csrf.html")
+    return template.render(req=req)

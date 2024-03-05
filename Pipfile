@@ -8,6 +8,7 @@ bs4 = "*"
 gmpy2 = "*"
 httpcore = {extras = ["asyncio"], version = "*"}
 httpx = {extras = ["http2"], version = "*"}
+jinja2 = "*"
 lxml = "*"
 pycryptodomex = "*"
 pyjwt = {extras = ["crypto"], version = "*"}

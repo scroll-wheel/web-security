@@ -5,4 +5,4 @@ from importlib import import_module
 # exploit from "lab-no-defenses".
 
 module = import_module(f"web_security_academy.web-security.csrf.lab-no-defenses")
-solve_lab = getattr(module, "solve_lab")(session)
+solve_lab = getattr(module, "solve_lab")

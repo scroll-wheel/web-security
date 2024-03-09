@@ -1,0 +1,10 @@
+{% macro csrf_post(req) %}
+<form action="{{ req.url }}" method="{{ req.method }}">
+    {% for name, value in req.data.items() %}
+        <input type="hidden" name="{{ name }}" value="{{ value }}">
+    {% endfor %}
+</form>
+<script>
+    document.forms[0].submit();
+</script>
+{% endmacro %}

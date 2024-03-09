@@ -1,0 +1,5 @@
+{% macro csrf_get(req) %}
+<script>
+    document.location = "{{ req.prepare().url }}"
+</script>
+{% endmacro %}

@@ -1,8 +1,11 @@
 from web_security_academy.core.logger import logger
 from bs4 import BeautifulSoup
+from pathlib import Path
 
 import requests
 import jinja2
+import inspect
+import os
 
 
 def print_success(string, end="\n"):
@@ -55,4 +58,5 @@ def auth_lab_passwords():
 def generate_csrf_html(req):
     env = jinja2.Environment(loader=jinja2.FileSystemLoader("templates"))
     template = env.get_template("csrf.html")
-    return template.render(req=req)
+    html = template.render(req=req)
+    return BeautifulSoup(html, "lxml").prettify()

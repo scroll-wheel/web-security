@@ -1,10 +1,11 @@
+{% from 'csrf_get.html' import csrf_get %}
+{% from 'csrf_post.html' import csrf_post %}
 <html>
     <body>
-        <form action="{{ req.url }}" method="{{ req.method }}">{% for name, value in req.data.items() %}
-            <input type="hidden" name="{{ name }}" value="{{ value }}">{% endfor %}
-        </form>
-        <script>
-            document.forms[0].submit();
-        </script>
+        {% if req.method == "GET" %}
+            {{ csrf_get(req) }}
+        {% else %}
+            {{ csrf_post(req) }}
+        {% endif %}
     </body>
 </html>

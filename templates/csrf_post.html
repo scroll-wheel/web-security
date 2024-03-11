@@ -1,7 +1,7 @@
 {% macro csrf_post(req) %}
-<form action="{{ req.url }}" method="{{ req.method }}">
+<form action="{{ req.url | e}}" method="{{ req.method | e }}">
     {% for name, value in req.data.items() %}
-        <input type="hidden" name="{{ name }}" value="{{ value }}">
+        <input type="hidden" name="{{ name | e }}" value="{{ value | e }}">
     {% endfor %}
 </form>
 <script>

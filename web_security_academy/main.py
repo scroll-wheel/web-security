@@ -54,7 +54,10 @@ def verify_lab_url(url, args):
 def get_solve_lab_func(path):
     module_path = path.replace("/", ".")
     logger.debug(f"Module path: {module_path}")
-    module = importlib.import_module(f"web_security_academy{module_path}")
+    try:
+        module = importlib.import_module(f"web_security_academy{module_path}.solution")
+    except ModuleNotFoundError:
+        module = importlib.import_module(f"web_security_academy{module_path}")
 
     module_solve_lab = getattr(module, "solve_lab")
     logger.debug('Imported "solve_lab" function from module.')

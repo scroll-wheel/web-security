@@ -60,3 +60,10 @@ def generate_csrf_html(req):
     template = env.get_template("csrf.html")
     html = template.render(req=req)
     return BeautifulSoup(html, "lxml").prettify()
+
+
+def read_file(filename):
+    file_path = os.path.abspath((inspect.stack()[1])[1])
+    dir_path = os.path.dirname(file_path)
+    with open(Path(dir_path) / filename, "rb") as f:
+        return f.read()

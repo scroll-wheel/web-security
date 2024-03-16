@@ -55,10 +55,10 @@ def auth_lab_passwords():
     return result
 
 
-def generate_csrf_html(req):
+def generate_csrf_html(req, referrer=True):
     env = jinja2.Environment(loader=jinja2.FileSystemLoader("templates"))
     template = env.get_template("csrf.html")
-    html = template.render(req=req)
+    html = template.render(req=req, referrer=referrer)
     return BeautifulSoup(html, "lxml").prettify()
 
 

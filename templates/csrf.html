@@ -1,6 +1,11 @@
 {% from 'csrf_get.html' import csrf_get %}
 {% from 'csrf_post.html' import csrf_post %}
 <html>
+    {% if not referrer %}
+        <head>
+            <meta name="referrer" content="never">
+        </head>
+    {% endif %}
     <body>
         {% if req.method == "GET" %}
             {{ csrf_get(req) }}

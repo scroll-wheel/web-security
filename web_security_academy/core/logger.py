@@ -27,14 +27,14 @@ addLoggingLevel("FAILURE", logging.INFO + 2)
 # Inspired by https://stackoverflow.com/questions/1343227/
 class MyFormatter(logging.Formatter):
     formats = {
-        logging.TRACE: "  %(msg)s",
-        logging.DEBUG: "▌ %(msg)s",
-        logging.INFO: "\033[1;94m▌\033[00m %(msg)s",
-        logging.SUCCESS: "\033[1;92m▌\033[00m %(msg)s",
-        logging.FAILURE: "\033[1;91m▌\033[00m %(msg)s",
-        logging.WARNING: "\033[1;93m▌\033[00m %(msg)s",
-        logging.ERROR: "\033[1;91m▌\033[00m %(msg)s",
-        logging.CRITICAL: "\033[1;91m▌\033[00m %(msg)s",
+        logging.TRACE: "\033[K  %(msg)s",
+        logging.DEBUG: "\033[K▌ %(msg)s",
+        logging.INFO: "\033[K\033[1;94m▌\033[00m %(msg)s",
+        logging.SUCCESS: "\033[K\033[1;92m▌\033[00m %(msg)s",
+        logging.FAILURE: "\033[K\033[1;91m▌\033[00m %(msg)s",
+        logging.WARNING: "\033[K\033[1;93m▌\033[00m %(msg)s",
+        logging.ERROR: "\033[K\033[1;91m▌\033[00m %(msg)s",
+        logging.CRITICAL: "\033[K\033[1;91m▌\033[00m %(msg)s",
     }
 
     def __init__(self):
@@ -55,3 +55,10 @@ handler.setFormatter(formatter)
 logger = logging.getLogger(__name__)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
+
+
+def set_terminator(self, terminator):
+    self.handlers[0].terminator = terminator
+
+
+logging.getLoggerClass().set_terminator = set_terminator

@@ -14,7 +14,7 @@ def solve_lab(session):
     session.post_path("/cart", data=data)
 
     credit = 100
-    logger.set_terminator("\r")
+    logger.toggle_newline()
     while credit < 1337:
         # Fill cart with $10 gift cards
         quantity = min(credit // 10, 99)
@@ -47,5 +47,5 @@ def solve_lab(session):
     data = {"productId": 1, "quantity": 1, "redir": "PRODUCT"}
     session.post_path("/cart", data=data)
     session.post_path("/cart/checkout", data={"csrf": csrf})
-    logger.set_terminator("\n")
+    logger.toggle_newline()
     logger.info('Bought a "Lightweight l33t leather jacket"')

@@ -27,14 +27,14 @@ addLoggingLevel("FAILURE", logging.INFO + 2)
 # Inspired by https://stackoverflow.com/questions/1343227/
 class MyFormatter(logging.Formatter):
     formats = {
-        logging.TRACE: "\033[K  %(msg)s",
-        logging.DEBUG: "\033[K▌ %(msg)s",
-        logging.INFO: "\033[K\033[1;94m▌\033[00m %(msg)s",
-        logging.SUCCESS: "\033[K\033[1;92m▌\033[00m %(msg)s",
-        logging.FAILURE: "\033[K\033[1;91m▌\033[00m %(msg)s",
-        logging.WARNING: "\033[K\033[1;93m▌\033[00m %(msg)s",
-        logging.ERROR: "\033[K\033[1;91m▌\033[00m %(msg)s",
-        logging.CRITICAL: "\033[K\033[1;91m▌\033[00m %(msg)s",
+        logging.TRACE: "\r\033[K  %(msg)s",
+        logging.DEBUG: "\r\033[K▌ %(msg)s",
+        logging.INFO: "\r\033[K\033[1;94m▌\033[00m %(msg)s",
+        logging.SUCCESS: "\r\033[K\033[1;92m▌\033[00m %(msg)s",
+        logging.FAILURE: "\r\033[K\033[1;91m▌\033[00m %(msg)s",
+        logging.WARNING: "\r\033[K\033[1;93m▌\033[00m %(msg)s",
+        logging.ERROR: "\r\033[K\033[1;91m▌\033[00m %(msg)s",
+        logging.CRITICAL: "\r\033[K\033[1;91m▌\033[00m %(msg)s",
     }
 
     def __init__(self):
@@ -57,8 +57,12 @@ logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
 
-def set_terminator(self, terminator):
-    self.handlers[0].terminator = terminator
+def toggle_newline(self):
+    match self.handlers[0].terminator:
+        case "\n":
+            self.handlers[0].terminator = ""
+        case "":
+            self.handlers[0].terminator = "\n"
 
 
-logging.getLoggerClass().set_terminator = set_terminator
+logging.getLoggerClass().toggle_newline = toggle_newline

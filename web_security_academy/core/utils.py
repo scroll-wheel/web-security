@@ -67,3 +67,11 @@ def read_file(filename):
     dir_path = os.path.dirname(file_path)
     with open(Path(dir_path) / filename, "rb") as f:
         return f.read()
+
+
+def render_template_file(filename, **kwargs):
+    file_path = os.path.abspath((inspect.stack()[1])[1])
+    dir_path = os.path.dirname(file_path)
+    env = jinja2.Environment(loader=jinja2.FileSystemLoader(dir_path))
+    template = env.get_template(filename)
+    return template.render(**kwargs)

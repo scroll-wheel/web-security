@@ -63,6 +63,7 @@ def toggle_newline(self):
             self.handlers[0].terminator = ""
         case "":
             self.handlers[0].terminator = "\n"
+            print()
 
 
 logging.getLoggerClass().toggle_newline = toggle_newline

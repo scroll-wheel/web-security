@@ -1,4 +1,4 @@
-from web_security_academy.core.utils import *
+from web_security_academy.core.logger import logger
 from lxml import etree
 
 
@@ -15,11 +15,11 @@ def solve_lab(session):
 
     data = {"productId": foo, "storeId": "1"}
 
-    print_info(
-        f'Injecting an XML external entity with the following POST request to "{path}":\n'
+    logger.info(
+        f'Injecting an XML external entity with the following POST request to "{path}":'
     )
-    print(f"{data}\n")
+    logger.info(f"{data}")
 
     resp = session.post_path(path, data=data)
-    print_success("XXE injection successful with the following response:\n")
-    print(f"{resp.text}\n")
+    logger.success("XXE injection successful with the following response:")
+    print(f"{resp.text}")

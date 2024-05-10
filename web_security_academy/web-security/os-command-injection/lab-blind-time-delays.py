@@ -1,4 +1,4 @@
-from web_security_academy.core.utils import *
+from web_security_academy.core.logger import logger
 import time
 
 
@@ -15,8 +15,8 @@ def solve_lab(session):
     }
 
     path = "/feedback/submit"
-    print_info(
-        f'Causing a 10 second dalay by sending a POST request to "{path}" with the following data:'
+    logger.info(
+        f'Causing a 10 second delay by sending a POST request to "{path}" with the following data:'
     )
     print(f"{data}")
 
@@ -26,6 +26,6 @@ def solve_lab(session):
 
     response_time = end - start
     if response_time > 10:
-        print_success(f"Response time: {response_time} seconds\n")
+        logger.success(f"Response time: {response_time} seconds")
     else:
-        print_fail(f"Response time: {response_time} seconds")
+        logger.failure(f"Response time: {response_time} seconds")

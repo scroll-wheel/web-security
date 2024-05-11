@@ -16,6 +16,7 @@ class LabSession(Session):
     def __init__(self, url):
         Session.__init__(self)
         self.url = urljoin(url, "/")
+        self.hostname = urlparse(self.url).hostname
 
     def get_path(self, path, **kwargs):
         url = urljoin(self.url, path)
@@ -162,12 +163,15 @@ class LabSession(Session):
         sock.close()
         return responses[:-1]
 
-    # Todo: Add proxy functionality
     def send_raw(self, req):
-        hostname = urlparse(self.url).hostname
-        with socket.create_connection((hostname, 443)) as sock:
-            ctx = ssl.create_default_context(cafile=certifi.where())
-            with ctx.wrap_socket(sock, server_hostname=hostname) as sock:
+        address = ("localhost", 8080) if self.proxies else (self.hostname, 443)
+        with socket.create_connection(address) as sock:
+            if self.proxies:
+                sock.sendall(f"CONNECT {self.hostname}:443 HTTP/1.1\r\n\r\n".encode())
+                sock.recv(65536 * 1024)
+
+            ctx = ssl._create_unverified_context()
+            with ctx.wrap_socket(sock, server_hostname=self.hostname) as sock:
                 sock.sendall(req)
 
                 resp = b""

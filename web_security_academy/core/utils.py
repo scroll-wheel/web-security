@@ -30,7 +30,7 @@ def print_fail(string):
 
 
 def print_input(string):
-    return input(f"\r\033[1;93m[i]\033[00m {string}")
+    return input(f"\r\033[1;95m▌\033[00m {string}")
 
 
 def auth_lab_usernames():

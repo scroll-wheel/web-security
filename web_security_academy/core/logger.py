@@ -57,13 +57,10 @@ logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
 
-def toggle_newline(self):
-    match self.handlers[0].terminator:
-        case "\n":
-            self.handlers[0].terminator = ""
-        case "":
-            self.handlers[0].terminator = "\n"
-            print()
+class NoNewline:
+    def __enter__(self):
+        logger.handlers[0].terminator = ""
 
-
-logging.getLoggerClass().toggle_newline = toggle_newline
+    def __exit__(self, *_):
+        logger.handlers[0].terminator = "\n"
+        print()

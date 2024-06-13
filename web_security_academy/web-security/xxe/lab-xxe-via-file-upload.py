@@ -1,5 +1,5 @@
 from web_security_academy.core.logger import logger
-from web_security_academy.core.utils import print_input
+from web_security_academy.core.utils import get_input
 from urllib.parse import urlencode, urljoin
 from bs4 import BeautifulSoup
 from html import unescape
@@ -67,5 +67,5 @@ def solve_lab(session):
         avatar_url = urljoin(session.url, avatar_img[-1].get("src"))
         logger.success(f"Avatar image URL: {avatar_url}")
 
-    hostname = print_input("Enter the hostname from the provided URL here: ")
+    hostname = get_input("Enter the hostname from the provided URL here: ")
     session.submit_solution(hostname)

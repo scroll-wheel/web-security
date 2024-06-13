@@ -8,28 +8,7 @@ import inspect
 import os
 
 
-def print_success(string, end="\n"):
-    print(f"\r\033[1;92m▌\033[00m {string}", end=end)
-
-
-def print_warning(string, end="\n"):
-    print(f"\r\033[1;93m▌\033[00m {string}", end=end)
-
-
-def print_info(string, end="\n"):
-    print(f"\r\033[1;94m▌\033[00m {string}", end=end)
-
-
-def print_info_secondary(string, end="\n"):
-    print(f"\r▌ {string}", end=end)
-
-
-def print_fail(string):
-    print(f"\r\033[1;91m▌\033[00m {string}")
-    exit(1)
-
-
-def print_input(string):
+def get_input(string):
     return input(f"\r\033[1;95m▌\033[00m {string}")
 
 

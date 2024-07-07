@@ -1,0 +1,24 @@
+<style>
+    iframe {
+        position:relative;
+        width: 700px;
+        height: 500px;
+        opacity: 0.1;
+        z-index: 2;
+    }
+    #first {
+        position:absolute;
+        top: 495px;
+        left: 60px;
+        z-index: 1;
+    }
+    #second {
+        position:absolute;
+        top: 290px;
+        left: 210px;
+        z-index: 1;
+    }
+</style>
+<div id="first">Click me first</div>
+<div id="second">Click me next</div>
+<iframe src="{{ url }}my-account"></iframe>

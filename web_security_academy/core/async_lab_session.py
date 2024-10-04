@@ -1,4 +1,3 @@
-from web_security_academy.core.lab_session import LabSession
 from web_security_academy.core.logger import logger
 
 from urllib.parse import urljoin

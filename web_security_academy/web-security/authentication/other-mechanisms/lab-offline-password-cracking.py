@@ -1,7 +1,6 @@
 from web_security_academy.core.logger import logger
 from bs4 import BeautifulSoup
 from base64 import b64decode
-from hashlib import md5
 
 import re
 

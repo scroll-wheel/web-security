@@ -5,7 +5,7 @@ import string
 
 def solve_lab(session):
     logger.info(
-        f'Determining the length of the administrator password by visiting "/" with the following cookies:'
+        'Determining the length of the administrator password by visiting "/" with the following cookies:'
     )
     logger.info(
         '{"TrackingId": "\' UNION SELECT password FROM users WHERE username=\'administrator\' AND LENGTH(password)=\033[1;93m?\033[00m --"}'
@@ -29,7 +29,7 @@ def solve_lab(session):
                 break
 
     logger.info(
-        f'Determining administrator password by visiting "/" with the following cookies:'
+        'Determining administrator password by visiting "/" with the following cookies:'
     )
     logger.info(
         '{"TrackingId": "\' UNION SELECT password FROM users WHERE username=\'administrator\' AND SUBSTRING(password, \033[1;93m?\033[00m, 1)=\033[1;93m?\033[00m --"}'

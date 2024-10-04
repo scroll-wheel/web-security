@@ -1,5 +1,4 @@
 from web_security_academy.core.logger import logger, NoNewline
-from bs4 import BeautifulSoup
 
 
 def solve_lab(session):

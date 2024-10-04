@@ -13,7 +13,7 @@ def solve_lab(session):
         "new-password-1": new_password,
         "new-password-2": new_password,
     }
-    logger.info(f"Changing password with the following data:")
+    logger.info("Changing password with the following data:")
     logger.info(data)
 
     resp = session.post_path("/my-account/change-password", data=data)

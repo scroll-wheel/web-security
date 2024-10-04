@@ -4,7 +4,7 @@ import re
 
 
 def solve_lab(session):
-    logger.info(f'Extracting passwords by visiting "/" with the following cookies:')
+    logger.info('Extracting passwords by visiting "/" with the following cookies:')
     logger.info(
         '{"TrackingId": "\' OR (SELECT password FROM users LIMIT 1 OFFSET \033[1;93m?\033[00m)::int=1 --"}'
     )

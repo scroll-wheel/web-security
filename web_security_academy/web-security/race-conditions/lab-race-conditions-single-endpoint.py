@@ -1,4 +1,3 @@
-from web_security_academy.core.async_lab_session import AsyncLabSession
 from web_security_academy.core.email_client import EmailClient
 from web_security_academy.core.logger import logger
 

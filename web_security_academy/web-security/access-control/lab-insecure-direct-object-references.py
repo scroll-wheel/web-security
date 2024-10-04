@@ -27,5 +27,5 @@ def solve_lab(session, *args):
         logger.success("Downloaded the following transcript:")
         print(resp.text)
 
-    password = re.search(f"my password is (.*)\.", resp.text).group(1)
+    password = re.search("my password is (.*)\.", resp.text).group(1)
     session.login("carlos", password)

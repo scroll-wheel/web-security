@@ -1,5 +1,4 @@
 from web_security_academy.core.logger import logger, NoNewline
-from urllib.parse import urlencode
 from bs4 import BeautifulSoup
 
 import string

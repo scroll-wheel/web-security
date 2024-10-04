@@ -5,8 +5,6 @@ from urllib.parse import urljoin
 from requests import Request
 from bs4 import BeautifulSoup
 
-import re
-
 
 def solve_lab(session):
     # Begin OAuth flow

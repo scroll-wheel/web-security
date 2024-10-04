@@ -8,7 +8,7 @@ def solve_lab(session, *args):
     data = {"csrf": csrf, "username": "wiener", "password": "peter"}
 
     logger.info(
-        f"Getting user profile path by extracting the redirect link from logging in..."
+        "Getting user profile path by extracting the redirect link from logging in..."
     )
     resp = session.post_path("/login", data=data, allow_redirects=False)
 

@@ -27,7 +27,7 @@ def solve_lab(session):
     logger.info(data)
     resp = session.post(url, json=data)
     if resp.status_code != 200:
-        logger.failure(f"GET request unsuccessful.")
+        logger.failure("GET request unsuccessful.")
         return
     else:
         logger.success("Success.")
@@ -37,7 +37,7 @@ def solve_lab(session):
     logger.info(session.cookies.get_dict())
     resp = session.get(url)
     if resp.status_code != 200:
-        logger.failure(f"Unable to visit URL.")
+        logger.failure("Unable to visit URL.")
         return
     else:
         logger.success("GET request came back with a successful response.")
@@ -56,6 +56,6 @@ def solve_lab(session):
     logger.info("Visiting URL to delete the user carlos...")
     resp = session.get(url)
     if resp.status_code != 200:
-        logger.failure(f"GET request unsuccessful.")
+        logger.failure("GET request unsuccessful.")
     else:
         logger.success("Success.")

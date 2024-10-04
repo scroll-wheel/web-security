@@ -41,7 +41,7 @@ def verify_lab_url(url, args):
             logger.warning("Lab already solved.")
             exit(1)
 
-    logger.trace(f"Using lab title to determine module path...")
+    logger.trace("Using lab title to determine module path...")
     resp = requests.get("https://portswigger.net/web-security/all-labs")
 
     # Return the path of the lab with matching title

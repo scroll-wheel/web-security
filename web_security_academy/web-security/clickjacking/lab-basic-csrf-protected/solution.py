@@ -1,5 +1,4 @@
 from web_security_academy.core.utils import render_template_file
-from web_security_academy.core.logger import logger
 
 
 def solve_lab(session):

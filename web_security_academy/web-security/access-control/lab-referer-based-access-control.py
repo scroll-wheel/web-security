@@ -1,6 +1,5 @@
 from web_security_academy.core.logger import logger
 from urllib.parse import urlencode, urljoin
-from bs4 import BeautifulSoup
 
 
 def solve_lab(session, *args):

@@ -2,7 +2,6 @@ from web_security_academy.core.logger import logger
 from urllib.parse import urlencode, urljoin
 from bs4 import BeautifulSoup
 
-import requests
 import re
 
 

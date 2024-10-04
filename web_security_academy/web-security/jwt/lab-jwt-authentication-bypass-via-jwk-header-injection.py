@@ -4,7 +4,6 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 from jose import jwk, constants
 
-import json
 import jwt
 
 
@@ -32,7 +31,7 @@ def solve_lab(session):
     logger.info(payload)
 
     session.cookies.set("session", token)
-    logger.info(f"Set the session cookie to signed JWT")
+    logger.info("Set the session cookie to signed JWT")
 
     session.get_path("/admin/delete?username=carlos")
     logger.info('Deleted user "carlos"')

@@ -60,7 +60,7 @@ def solve_lab(session):
         logger.failure("Unable to retrieve usernames and passwords.")
         return
 
-    logger.success(f"Successfully retrieved usernames and passwords.")
+    logger.success("Successfully retrieved usernames and passwords.")
     logger.info("Extracting administrator password...")
 
     for tag in query:

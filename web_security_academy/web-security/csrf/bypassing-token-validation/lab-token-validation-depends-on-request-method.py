@@ -1,4 +1,3 @@
-from web_security_academy.core.logger import logger
 from web_security_academy.core.utils import generate_csrf_html
 
 from urllib.parse import urljoin

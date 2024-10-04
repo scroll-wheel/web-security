@@ -1,6 +1,5 @@
 from web_security_academy.core.email_client import EmailClient
 from web_security_academy.core.logger import logger
-from bs4 import BeautifulSoup
 import re
 
 

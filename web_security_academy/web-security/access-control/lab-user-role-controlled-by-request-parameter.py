@@ -2,8 +2,6 @@ from web_security_academy.core.logger import logger
 from urllib.parse import urljoin
 from bs4 import BeautifulSoup
 
-import re
-
 
 def solve_lab(session, *args):
     session.login("wiener", "peter")
@@ -18,7 +16,7 @@ def solve_lab(session, *args):
 
     resp = session.get(url)
     if resp.status_code != 200:
-        logger.failure(f"Unable to visit URL.")
+        logger.failure("Unable to visit URL.")
         return
     else:
         logger.success("GET request came back with a successful response.")
@@ -37,6 +35,6 @@ def solve_lab(session, *args):
     logger.info("Visiting URL to delete the user carlos...")
     resp = session.get(url)
     if resp.status_code != 200:
-        logger.failure(f"GET request unsuccessful.")
+        logger.failure("GET request unsuccessful.")
     else:
         logger.success("Success.")

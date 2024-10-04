@@ -14,7 +14,7 @@ def get_product_info(session, productId):
 def solve_lab(session):
     resp = session.login("wiener", "peter")
     soup = BeautifulSoup(resp.text, "lxml")
-    regex = re.compile(f"Store credit: (.*)")
+    regex = re.compile("Store credit: (.*)")
     credit = soup.find(text=regex)
     credit = re.match(regex, credit).group(1)
     logger.info(f"Credit: {credit}")

@@ -12,7 +12,7 @@ def solve_lab(session, *args):
     )
     resp = session.get_path("/")
     if resp.status_code != 200:
-        logger.failure(f"Unable to visit URL.")
+        logger.failure("Unable to visit URL.")
         return
 
     match = re.search(r"adminPanelTag.setAttribute\('href', '(.*)'\);", resp.text)
@@ -26,7 +26,7 @@ def solve_lab(session, *args):
     logger.info(f'Visiting "{url}"...')
     resp = session.get(url)
     if resp.status_code != 200:
-        logger.failure(f"Unable to visit URL.")
+        logger.failure("Unable to visit URL.")
         return
     else:
         logger.success("GET request came back with a successful response.")
@@ -45,6 +45,6 @@ def solve_lab(session, *args):
     logger.info("Visiting URL to delete the user carlos...")
     resp = session.get(url)
     if resp.status_code != 200:
-        logger.failure(f"GET request unsuccessful.")
+        logger.failure("GET request unsuccessful.")
     else:
         logger.success("Success.")

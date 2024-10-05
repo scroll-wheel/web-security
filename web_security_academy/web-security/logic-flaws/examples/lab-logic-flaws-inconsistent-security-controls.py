@@ -33,7 +33,7 @@ def solve_lab(session):
     session.get(url)
 
     # Privilege escalation
-    resp = session.login("attacker", "123456")
+    session.login("attacker", "123456")
     csrf = session.get_csrf_token("/my-account")
 
     email = "attacker@dontwannacry.com"

@@ -16,7 +16,6 @@ def solve_lab(session):
                 data = {"username": "wiener", "password": "peter"}
                 session.post_path("/login", data=data, allow_redirects=False)
 
-            headers = None
             data = {"username": user, "password": password}
             resp = session.post_path("/login", data=data, allow_redirects=False)
 

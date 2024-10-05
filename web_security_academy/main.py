@@ -46,7 +46,10 @@ def verify_lab_url(url, args):
 
     # Return the path of the lab with matching title
     soup = BeautifulSoup(resp.text, "lxml")
-    matchfunc = lambda tag: tag.text.strip() == title
+
+    def matchfunc(tag):
+        return tag.text.strip() == title
+
     res = soup.find(matchfunc)
     return res.attrs["href"]
 

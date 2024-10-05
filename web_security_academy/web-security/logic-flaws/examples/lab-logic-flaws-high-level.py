@@ -26,7 +26,6 @@ def solve_lab(session):
 
     name, price_2 = get_product_info(session, 2)
 
-    c = float(credit[1:])
     p1 = float(price_1[1:])
     p2 = float(price_2[1:])
     n = int((100 - p1) // p2)

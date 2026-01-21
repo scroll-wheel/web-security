@@ -1,7 +1,7 @@
-from web_security_academy.core.logger import logger
-
-from bs4 import BeautifulSoup
 import re
+
+from .logger import logger
+from .utils import bs4
 
 
 class EmailClient:
@@ -11,7 +11,7 @@ class EmailClient:
         logger.debug("Determining email client URL...")
 
         resp = session.get_path("/")
-        soup = BeautifulSoup(resp.text, "lxml")
+        soup = bs4(resp.text)
         exploit_link = soup.select_one("#exploit-link")
 
         if exploit_link is None:
@@ -24,8 +24,8 @@ class EmailClient:
         self.update_emails()
 
     def update_emails(self):
-        resp = self.session.get(self.url)
-        soup = BeautifulSoup(resp.text, "lxml")
+        resp = self.session.get(self.url, proxy=None)
+        soup = bs4(resp.text)
         h4 = soup.select_one("h4")
         self.address = re.match("Your email address is (.*)", h4.text).group(1)
 
@@ -34,7 +34,7 @@ class EmailClient:
 
         self.emails = []
         for row in query:
-            soup = BeautifulSoup(str(row), "lxml")
+            soup = bs4(str(row))
             data = soup.select("td")
             email = {
                 "Sent": data[0].text,

@@ -5,34 +5,125 @@ from urllib.parse import urljoin, urlparse
 
 import certifi
 import h2
-from bs4 import BeautifulSoup
-from requests import Session
-
-from web_security_academy.core.logger import logger
+import httpx
+import requests
+import urllib3
 
 from .exploit_server import ExploitServer
+from .logger import logger
+from .utils import bs4
 
 
-class LabSession(Session):
-    def __init__(self, url):
-        Session.__init__(self)
+class LabSession:
+    def __init__(self, url, use_httpx=True, use_proxy=False):
+        self.use_httpx = use_httpx
+        if use_httpx:
+            if use_proxy:
+                logger.debug('Using "http://127.0.0.1:8080" as a proxy')
+                self.client = httpx.Client(
+                    proxy="http://127.0.0.1:8080",
+                    verify=False,
+                )
+                self.async_client = httpx.AsyncClient(
+                    proxy="http://127.0.0.1:8080",
+                    verify=False,
+                )
+            else:
+                self.client = httpx.Client()
+                self.async_client = httpx.AsyncClient()
+        else:
+            if use_proxy:
+                logger.debug('Using "http://127.0.0.1:8080" as a proxy')
+                urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+                self.client = requests.Session()
+                self.client.proxies.update(
+                    {
+                        "http": "http://127.0.0.1:8080",
+                        "https": "http://127.0.0.1:8080",
+                    }
+                )
+                self.client.verify = False
+            else:
+                self.client = requests.Session()
+
         self.url = urljoin(url, "/")
         self.hostname = urlparse(self.url).hostname
+        self.cookies = self.client.cookies
 
     def get_path(self, path, **kwargs):
         url = urljoin(self.url, path)
-        return Session.get(self, url, **kwargs)
+        return self.client.get(url, **kwargs)
+
+    async def a_get_path(self, path, **kwargs):
+        url = urljoin(self.url, path)
+        return self.async_client.get(url, **kwargs)
+
+    def head_path(self, path, **kwargs):
+        url = urljoin(self.url, path)
+        return self.client.head(url, **kwargs)
+
+    async def a_head_path(self, path, **kwargs):
+        url = urljoin(self.url, path)
+        return self.async_client.head(url, **kwargs)
+
+    def options_path(self, path, **kwargs):
+        url = urljoin(self.url, path)
+        return self.client.options(url, **kwargs)
+
+    async def a_options_path(self, path, **kwargs):
+        url = urljoin(self.url, path)
+        return self.async_client.options(url, **kwargs)
 
     def post_path(self, path, **kwargs):
         url = urljoin(self.url, path)
-        return Session.post(self, url, **kwargs)
+        return self.client.post(url, **kwargs)
+
+    async def a_post_path(self, path, **kwargs):
+        url = urljoin(self.url, path)
+        return self.async_client.post(url, **kwargs)
+
+    def put_path(self, path, **kwargs):
+        url = urljoin(self.url, path)
+        return self.client.put(url, **kwargs)
+
+    async def a_put_path(self, path, **kwargs):
+        url = urljoin(self.url, path)
+        return self.async_client.put(url, **kwargs)
+
+    def patch_path(self, path, **kwargs):
+        url = urljoin(self.url, path)
+        return self.client.path(url, **kwargs)
+
+    async def a_patch_path(self, path, **kwargs):
+        url = urljoin(self.url, path)
+        return self.async_client.patch(url, **kwargs)
+
+    def delete_path(self, path, **kwargs):
+        url = urljoin(self.url, path)
+        return self.client.delete(url, **kwargs)
+
+    async def a_delete_path(self, path, **kwargs):
+        url = urljoin(self.url, path)
+        return self.async_client.delete(url, **kwargs)
 
     def get_csrf_token(self, path, n=1):
-        url = urljoin(self.url, path)
         logger.trace(f'Grabbing CSRF value from "{path}"...')
+        resp = self.get_path(path)
+        soup = bs4(resp.text)
+        query = soup.select('input[name="csrf"]')
 
-        resp = Session.get(self, url)
-        soup = BeautifulSoup(resp.text, "lxml")
+        if len(query) < n:
+            logger.failure(f'Unable to grab CSRF value from "{path}"')
+            exit(1)
+        else:
+            csrf = query[n - 1].get("value")
+            logger.debug(f'CSRF value from "{path}": {csrf}')
+        return csrf
+
+    async def a_get_csrf_token(self, path, n=1):
+        logger.trace(f'Grabbing CSRF value from "{path}"...')
+        resp = await self.a_get_path(path)
+        soup = bs4(resp.text)
         query = soup.select('input[name="csrf"]')
 
         if len(query) < n:
@@ -55,11 +146,41 @@ class LabSession(Session):
         )
 
         if with_json:
-            resp = self.post_path("/login", json=data)
+            resp = self.post_path("/login", json=data, follow_redirects=True)
         else:
-            resp = self.post_path("/login", data=data)
+            resp = self.post_path("/login", data=data, follow_redirects=True)
 
-        soup = BeautifulSoup(resp.text, "lxml")
+        soup = bs4(resp.text)
+        invalid_creds = soup.find(text="Invalid username or password.")
+
+        if invalid_creds:
+            logger.failure(
+                f'Unable to log in with username "{username}" and password "{password}"'
+            )
+        else:
+            logger.info(
+                f'Logged in with username "{username}" and password "{password}"'
+            )
+
+        return resp
+
+    async def a_login(self, username, password, with_csrf=True, with_json=False):
+        if not with_csrf:
+            data = {"username": username, "password": password}
+        else:
+            csrf = await self.a_get_csrf_token("/login")
+            data = {"csrf": csrf, "username": username, "password": password}
+
+        logger.trace(
+            f'Logging in with username "{username}" and password "{password}"...'
+        )
+
+        if with_json:
+            resp = await self.a_post_path("/login", json=data, follow_redirects=True)
+        else:
+            resp = await self.a_post_path("/login", data=data, follow_redirects=True)
+
+        soup = bs4(resp.text)
         invalid_creds = soup.find(text="Invalid username or password.")
 
         if invalid_creds:
@@ -75,9 +196,16 @@ class LabSession(Session):
 
     def submit_solution(self, answer):
         logger.trace(f'Submitting "{answer}" as solution...')
-        url = urljoin(self.url, "/submitSolution")
-        data = {"answer": answer}
-        resp = Session.post(self, url, data=data)
+        resp = self.post_path("/submitSolution", data={"answer": answer})
+
+        if resp.json()["correct"]:
+            logger.success(f'Submitted answer "{answer}" is correct!')
+        else:
+            logger.failure(f'Submitted answer "{answer}" is incorrect')
+
+    async def a_submit_solution(self, answer):
+        logger.trace(f'Submitting "{answer}" as solution...')
+        resp = await self.a_post_path("/submitSolution", data={"answer": answer})
 
         if resp.json()["correct"]:
             logger.success(f'Submitted answer "{answer}" is correct!')
@@ -187,3 +315,25 @@ class LabSession(Session):
                     if not data:
                         break
                 return resp
+
+    def auth_lab_usernames(self):
+        resp = self.client.get(
+            "https://portswigger.net/web-security/authentication/auth-lab-usernames",
+            proxy=None,
+        )
+        soup = bs4(resp.text)
+        query = soup.select_one("code")
+        result = query.text.split("\n")
+        logger.info("Loaded Authentication lab usernames into memory")
+        return result
+
+    def auth_lab_passwords(self):
+        resp = self.client.get(
+            "https://portswigger.net/web-security/authentication/auth-lab-passwords",
+            proxy=None,
+        )
+        soup = bs4(resp.text)
+        query = soup.select_one("code")
+        result = query.text.split("\n")
+        logger.info("Loaded Authentication lab passwords into memory")
+        return result
